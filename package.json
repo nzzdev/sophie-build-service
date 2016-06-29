@@ -1,0 +1,27 @@
+{
+  "name": "sophie-build-service",
+  "version": "0.0.1",
+  "description": "Sophie Build Service",
+  "main": "index.js",
+  "engines": {
+    "node": "4.4.0"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Beni Buess <beni.buess@nzz.ch>",
+  "dependencies": {
+    "aws-sdk": "^2.4.3",
+    "boom": "^3.2.2",
+    "btoa": "^1.1.2",
+    "fs-extra": "^0.30.0",
+    "github-api": "^2.3.0",
+    "hapi": "^13.4.1",
+    "node-fetch": "^1.5.3",
+    "node-sass": "^3.8.0",
+    "nodegit": "^0.14.1",
+    "semver": "^5.2.0",
+    "tar": "^2.2.1",
+    "tarball-extract": "0.0.3"
+  }
+}

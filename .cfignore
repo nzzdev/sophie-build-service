@@ -1,0 +1,4 @@
+node_modules
+.foreverignore
+README.md
+tmp
