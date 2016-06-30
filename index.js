@@ -3,7 +3,6 @@
 const hapi = require('hapi')
 const boom = require('boom');
 
-
 const loadSophieBundle = require('./lib/loadSophieBundle.js')
 
 const server = new hapi.Server();
@@ -29,9 +28,10 @@ server.route({
 
     loadSophieBundle(packages)
       .then(styles => {
-        reply(styles);
+        reply(styles).type('text/css');
       })
       .catch(err => {
+        console.log('err', err)
         const error = Boom.create(500);
         error.reformat();
         reply(error);
