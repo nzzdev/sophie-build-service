@@ -1,10 +1,10 @@
 {
   "name": "sophie-build-service",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "Sophie Build Service",
   "main": "index.js",
   "engines": {
-    "node": "4.4.0"
+    "node": "^4.4.0"
   },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
