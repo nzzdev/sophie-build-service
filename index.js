@@ -1,9 +1,12 @@
 'use strict';
 
-const hapi = require('hapi')
+const schedule = require('node-schedule');
+const hapi = require('hapi');
 const boom = require('boom');
 
 const loadSophieBundle = require('./lib/loadSophieBundle.js')
+const revalidateBundles = require('./lib/revalidateBundles.js')
+const helpers = require('./lib/helpers.js')
 
 const server = new hapi.Server();
 server.connection({
@@ -15,23 +18,12 @@ server.connection({
 
 server.route({
   method: ['GET', 'OPTIONS'],
-  path: '/bundle/{packages}.css',
+  path: '/bundle/{bundleId}.css',
   handler: function(request, reply) {
 
-    const packages = request.params.packages.split(',')
-      .map(p => {
-        let submodules;
-        if (p.split('[')[0] !== p) {
-          submodules = p.split('[')[1].replace(']','');
-        }
-        return {
-          name: p.split('[')[0].split('@')[0],
-          version: p.split('[')[0].split('@')[1],
-          submodules: typeof submodules === 'string' ? submodules.split('+') : undefined
-        }
-      })
+    const packages = helpers.getPackagesFromBundleId(request.params.bundleId);
 
-    loadSophieBundle(packages)
+    loadSophieBundle(packages, 'css')
       .then(bundle => {
         const response = reply(bundle.styles)
 
@@ -45,8 +37,7 @@ server.route({
 
       })
       .catch(err => {
-        console.log('err', err)
-        const error = Boom.create(500);
+        const error = boom.create(500);
         error.reformat();
         reply(error);
       })
@@ -61,4 +52,8 @@ server.start((err) => {
   console.log('Server running at:', server.info.uri);
 });
 
+var rebuildBundlesJob = schedule.scheduleJob('0 /2 * * *', function() {
+  console.log('revalidateBundles');
+  revalidateBundles();
+});
 
