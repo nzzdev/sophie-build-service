@@ -52,8 +52,7 @@ server.start((err) => {
   console.log('Server running at:', server.info.uri);
 });
 
-var rebuildBundlesJob = schedule.scheduleJob('0 /2 * * *', function() {
+var rebuildBundlesJob = schedule.scheduleJob('0 */2 * * *', function() {
   console.log('revalidateBundles');
   revalidateBundles();
 });
-
