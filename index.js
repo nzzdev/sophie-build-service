@@ -52,7 +52,10 @@ server.start((err) => {
   console.log('Server running at:', server.info.uri);
 });
 
-var rebuildBundlesJob = schedule.scheduleJob('0 */2 * * *', function() {
-  console.log('revalidateBundles');
-  revalidateBundles();
-});
+// only if not in cloudfoundry or this is the first instance we want the scheduler to run
+if (process.env.CF_INSTANCE_INDEX === undefined || process.env.CF_INSTANCE_INDEX === 0) {
+  var rebuildBundlesJob = schedule.scheduleJob('0 */2 * * *', function() {
+    console.log('revalidateBundles');
+    revalidateBundles();
+  });
+}
