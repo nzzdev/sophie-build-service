@@ -1,6 +1,6 @@
 {
   "name": "sophie-build-service",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "Sophie Build Service",
   "main": "index.js",
   "engines": {
@@ -18,10 +18,12 @@
     "fs-extra": "^0.30.0",
     "github-api": "^2.3.0",
     "hapi": "^13.4.1",
+    "hapi-alive": "^1.4.0",
     "node-fetch": "^1.5.3",
     "node-sass": "^3.8.0",
     "node-schedule": "^1.1.1",
     "nodegit": "^0.14.1",
+    "pidusage": "^1.1.1",
     "semver": "^5.2.0",
     "tar": "^2.2.1",
     "tarball-extract": "0.0.3"
