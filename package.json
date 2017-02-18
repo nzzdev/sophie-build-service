@@ -13,6 +13,7 @@
   "dependencies": {
     "boom": "^3.2.2",
     "btoa": "^1.1.2",
+    "catbox-memory": "^2.0.4",
     "debug": "^2.6.1",
     "fs-extra": "^0.30.0",
     "github-api": "^2.3.0",
