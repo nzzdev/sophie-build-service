@@ -2,9 +2,7 @@ const Hoek = require('hoek');
 const server = require('./server.js');
 const routes = require('./routes/routes.js')
 
-const plugins = [
-	require('hapijs-status-monitor')
-]
+const plugins = [];
 
 server.register(plugins, err => {
   Hoek.assert(!err, err);
