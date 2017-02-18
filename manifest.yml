@@ -1,7 +1,0 @@
----
-buildpack: nodejs_buildpack
-applications:
-- name: sophie-service
-  domain: st-app.nzz.ch
-  memory: 128MB
-  instances: 2
