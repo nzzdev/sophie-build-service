@@ -36,7 +36,6 @@ if (process.env.LOGGLY_TOKEN && process.env.LOGGLY_SUBDOMAIN && process.env.LOGG
       name: 'Squeeze',
       args: [
         {
-          log: '*',
           response: {
             include: '*',
             exclude: 'health'
