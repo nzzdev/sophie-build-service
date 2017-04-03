@@ -67,14 +67,16 @@ const plugins = [
       tags: ['health', 'monitor'],
       healthCheck: function(server, callback) {
         pusage.stat(process.pid, function(err, stat) {
-          var error;
+          if (err) {
+            return callback(err);
+          }
           if (stat.cpu > 90) {
-            error = new Boom.internal('load is too high');
+            return callback(new Boom.internal('load is too high'));
           }
           if ((stat.memory / 1000000) > 1000) {
-            error = new Boom.internal('memory usage is too high');
+            return callback(new Boom.internal('memory usage is too high'));
           }
-          callback(error);
+          callback();
         })
       }
     }
