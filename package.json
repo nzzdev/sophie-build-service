@@ -1,10 +1,10 @@
 {
   "name": "sophie-build-service",
-  "version": "1.1.0",
+  "version": "1.2.0",
   "description": "Sophie Build Service",
   "main": "index.js",
   "engines": {
-    "node": "6"
+    "node": "7"
   },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 0"
@@ -17,6 +17,10 @@
     "debug": "^2.6.1",
     "fs-extra": "^0.30.0",
     "github-api": "^2.3.0",
+    "good": "^7.1.0",
+    "good-console": "^6.4.0",
+    "good-loggly": "^3.1.0",
+    "good-squeeze": "^5.0.2",
     "hapi": "^13.4.1",
     "hapi-alive": "^1.4.0",
     "node-fetch": "^1.5.3",
