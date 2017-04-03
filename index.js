@@ -4,6 +4,45 @@ const server = require('./server.js');
 const routes = require('./routes/routes.js')
 const pusage = require('pidusage')
 
+let goodOptions = {
+  reporters: {
+    consoleReporter: [
+      {
+        module: 'good-squeeze',
+        name: 'Squeeze',
+        args: [{ log: '*', response: '*' }]
+      },
+      {
+        module: 'good-console',
+        args: [{ format: '', utc: false }]
+      },
+      'stdout'
+    ]
+  }
+}
+
+if (process.env.LOGGLY_TOKEN && process.env.LOGGLY_SUBDOMAIN && process.env.LOGGLY_HOSTNAME) {
+  goodOptions.reporters.loggly = [
+    {
+      module: 'good-squeeze',
+      name: 'Squeeze',
+      args: [{ log: '*', response: '*' }]
+    },
+    {
+      module: require('good-loggly'),
+      args: [{
+        token: process.env.LOGGLY_TOKEN,
+        subdomain: process.env.LOGGLY_SUBDOMAIN,
+        tags: '*',
+        name: 'sophie build service',
+        hostname: process.env.LOGGLY_HOSTNAME,
+        threshold: 20,
+        maxDelay: 15000
+      }]
+    }
+  ]
+}
+
 const plugins = [
   {
     register: require('hapi-alive'),
@@ -23,6 +62,10 @@ const plugins = [
         })
       }
     }
+  },
+  {
+    register: require('good'),
+    options: goodOptions
   }
 ];
 
