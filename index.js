@@ -10,7 +10,15 @@ let goodOptions = {
       {
         module: 'good-squeeze',
         name: 'Squeeze',
-        args: [{ log: '*', response: '*' }]
+        args: [
+          {
+            log: '*',
+            response: {
+              include: '*',
+              exclude: 'health'
+            }
+          }
+        ]
       },
       {
         module: 'good-console',
@@ -26,7 +34,15 @@ if (process.env.LOGGLY_TOKEN && process.env.LOGGLY_SUBDOMAIN && process.env.LOGG
     {
       module: 'good-squeeze',
       name: 'Squeeze',
-      args: [{ log: '*', response: '*' }]
+      args: [
+        {
+          log: '*',
+          response: {
+            include: '*',
+            exclude: 'health'
+          }
+        }
+      ]
     },
     {
       module: require('good-loggly'),
