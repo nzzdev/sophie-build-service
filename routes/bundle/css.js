@@ -10,20 +10,18 @@ const getSophieCssBundle = function(bundleId, next) {
       next(null, bundle);
     })
     .catch(err => {
-      console.log('ERROR', err)
       if (err.isBoom) {
         next(err, null);
       } else {
-        console.log(err)
         next(Boom.internal(err), null);
       }
     })
-};  
+};
 
 server.method('getSophieCssBundle', getSophieCssBundle, {
   cache: {
     expiresIn: 48 * 60 * 60 * 1000, // expire after 48 hours
-    staleIn: 1 * 60 * 60 * 1000, // rebuild bundles every 1 hour on request
+    staleIn: 1 * 60 * 15 * 1000, // rebuild bundles every 15 minutes on request
     staleTimeout: 1, // do not wait before returning a stale bundle
     generateTimeout: 30 * 60 * 1000 // 30 minutes
   }
