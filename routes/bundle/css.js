@@ -1,5 +1,6 @@
 const server = require('../../server');
 const Boom = require('boom');
+const debug = require('debug')('sophie');
 
 const helpers = require('../../lib/helpers.js');
 const loadSophieBundle = require('../../lib/loadSophieBundle');
@@ -11,8 +12,10 @@ const getSophieCssBundle = function(bundleId, next) {
     })
     .catch(err => {
       if (err.isBoom) {
+        debug(`failed to load bundle (error isBoom): ${bundleId}`);
         next(err, null);
       } else {
+        debug(`failed to load bundle: ${bundleId} ${err}`);
         next(Boom.internal(err), null);
       }
     })
@@ -39,6 +42,7 @@ module.exports = [
     handler: function(request, reply) {
       request.server.methods.getSophieCssBundle(request.params.bundleId, (err, styles) => {
         if (err) {
+          debug(`failed to load bundle: ${request.params.bundleId}`);
           return reply(err);
         }
         reply(styles).type('text/css');

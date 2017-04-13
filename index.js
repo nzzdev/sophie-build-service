@@ -2,7 +2,7 @@ const Hoek = require('hoek');
 const Boom = require('boom');
 const server = require('./server.js');
 const routes = require('./routes/routes.js')
-const pusage = require('pidusage')
+const pusage = require('pidusage');
 
 let goodOptions = {
   reporters: {
