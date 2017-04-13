@@ -1,6 +1,6 @@
 {
   "name": "sophie-build-service",
-  "version": "1.2.0",
+  "version": "1.2.1",
   "description": "Sophie Build Service",
   "main": "index.js",
   "engines": {
