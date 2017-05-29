@@ -34,18 +34,19 @@ module.exports = [
   {
     method: ['GET', 'OPTIONS'],
     path: '/bundle/{bundleId}.css',
-    config: {
-      cache: {
-        expiresIn: 12 * 60 * 60 * 1000
-      }
-    },
     handler: function(request, reply) {
       request.server.methods.getSophieCssBundle(request.params.bundleId, (err, styles) => {
         if (err) {
           debug(`failed to load bundle: ${request.params.bundleId}`);
           return reply(err);
         }
-        reply(styles).type('text/css');
+        const maxAge = 12 * 60 * 60; // 12 hours client side caching
+        const sMaxAge = 60 * 60; // 1 hour proxy caching
+        const maxStaleAge = maxAge + (7 * 60 * 60 * 24) // 7 days additional stale-while-revalidate, stale-if-error
+
+        reply(styles)
+          .type('text/css')
+          .header('cache-control', `public, max-age=${maxAge}, stale-while-revalidate=${maxStaleAge}, stale-if-error=${maxStaleAge}, s-maxage=${sMaxAge}`);
       })
 
     }
