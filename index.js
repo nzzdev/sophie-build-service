@@ -5,7 +5,6 @@ const routes = require('./routes/routes.js')
 const pusage = require('pidusage');
 const path = require('path');
 
-
 async function start() {
   const server = Hapi.server({
     port: process.env.PORT || 3000,

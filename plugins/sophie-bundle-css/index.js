@@ -1,6 +1,7 @@
 const fs = require('fs-extra');
 const path = require('path');
 const Hoek = require('hoek');
+const Boom = require('boom');
 const sass = require('node-sass');
 
 const defaultServerMethodCaching = {
@@ -16,7 +17,9 @@ module.exports = {
 
     Hoek.assert(options.tmpDir, 'tmpDir is a required option');
 
+    // $lab:coverage:off$
     const cacheConfig = Hoek.applyToDefaults(defaultServerMethodCaching, options.serverCacheConfig || {});
+    // $lab:coverage:on$
 
     server.method('sophie.generateBundle.css', async function(bundleId) {
       const packages = server.methods.sophie.bundle.getPackagesFromBundleId(bundleId);
@@ -37,22 +40,22 @@ module.exports = {
         }
   
         let fileName;
-        while(fileName = filesToCompile.pop()) {
+        while(fileName = filesToCompile.shift()) {
           server.log(['debug'], `compiling styles ${fileName} of ${pack.name}`);
-          const rendered = sass.renderSync({
-            file: path.join(options.tmpDir, bundleId, pack.name, pack.version, fileName),
-            includePaths: [path.join(options.tmpDir, bundleId, pack.name, pack.version, 'sophie_packages')],
-            outputStyle: 'compressed'
-          });
+          let rendered;
+          try {
+            rendered = sass.renderSync({
+              file: path.join(options.tmpDir, bundleId, pack.name, pack.version, fileName),
+              includePaths: [path.join(options.tmpDir, bundleId, pack.name, pack.version, 'sophie_packages')],
+              outputStyle: 'compressed'
+            });
+          } catch (err) {
+            throw Boom.badImplementation(`sass compilation error in package ${pack.name}@${pack.version} file ${fileName}: ${err.message}`);
+          }
   
           const styles = rendered.css.toString()
-          if (styles) {
-            server.log(['debug'], `compiled styles ${fileName} of ${pack.name}`);
-            compiledStyles += styles;
-          } else {
-            server.log(['debug'], `failed to compile styles ${fileName} of ${pack.name}`);
-            throw new Error(rendered);
-          }
+          server.log(['debug'], `compiled styles ${fileName} of ${pack.name}`);
+          compiledStyles += styles;
         }
       }
   

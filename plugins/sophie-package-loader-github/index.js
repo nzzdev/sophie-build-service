@@ -1,3 +1,4 @@
+const Boom = require('boom');
 const fs = require('fs-extra');
 const path = require('path');
 const btoa = require('btoa');
@@ -29,7 +30,15 @@ module.exports = {
       server.log(['debug'], `loading package ${pack.name}`);
       const repo = gh.getRepo('nzzdev', pack.name);
 
-      const releases = await repo.listReleases();
+      let releases;
+      try {
+        releases = await repo.listReleases();
+      } catch (err) {
+        if (err.response.status === 404) {
+          throw Boom.notFound('At least one requested module could not be found');
+        }
+        throw Boom.internal();
+      }
 
       // find the satisfying release
       const satisfyingRelease = getSatisfyingRelease(releases.data, pack.version);

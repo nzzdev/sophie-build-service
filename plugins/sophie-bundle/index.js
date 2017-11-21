@@ -12,14 +12,15 @@ module.exports = {
       // we do not want to load the same bundle twice at the same time
       // so if we already have a loading promise for this bundle we return this right away
       if (bundlesLoading.hasOwnProperty(id)) {
+        server.log(['debug', 'sophie-bundle'], 'returning existing bundle loading promise');
         return bundlesLoading[id];
       }
 
-      if (!server.method.sophie.generateBundle[type]) {
+      if (!server.methods.sophie.generateBundle[type]) {
         throw Boom.notImplemented(`no generator for bundle type ${type} implemented`);
       }
 
-      const generatePromise = server.method.sophie.generateBundle[type](bundleId, type)
+      const generatePromise = server.methods.sophie.generateBundle[type](bundleId, type)
         .then(bundle => {
           delete bundlesLoading[id];
           return bundle;
@@ -43,6 +44,7 @@ module.exports = {
         });
     })
 
+    // this is not actually used anywhere, but we keep it around anyway
     server.method('sophie.bundle.getBundleIdFromPackages', function(packages) {
       return packages.map(p => {
         let bundleIdPart = p.name + '@' + p.version

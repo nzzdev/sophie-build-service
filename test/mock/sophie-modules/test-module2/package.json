@@ -1,0 +1,11 @@
+{
+  "name": "test-module2",
+  "version": "1.0.0",
+  "description": "Sophie test module",
+  "dependencies": {
+    "node-sass": "^3.8.0"
+  },
+  "sophie": {
+    "mainCss": "foo.scss"
+  }
+}
