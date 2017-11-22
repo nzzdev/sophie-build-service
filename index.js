@@ -1,98 +1,54 @@
 const Hoek = require('hoek');
 const Boom = require('boom');
-const server = require('./server.js');
+const Hapi = require('hapi');
 const routes = require('./routes/routes.js')
 const pusage = require('pidusage');
+const path = require('path');
 
-let goodOptions = {
-  reporters: {
-    consoleReporter: [
+async function start() {
+  const server = Hapi.server({
+    port: process.env.PORT || 3000,
+    cache: [
       {
-        module: 'good-squeeze',
-        name: 'Squeeze',
-        args: [
-          {
-            log: '*',
-            response: {
-              include: '*',
-              exclude: 'health'
-            }
-          }
-        ]
-      },
-      {
-        module: 'good-console',
-        args: [{ format: '', utc: false }]
-      },
-      'stdout'
-    ]
-  }
-}
-
-if (process.env.LOGGLY_TOKEN && process.env.LOGGLY_SUBDOMAIN && process.env.LOGGLY_HOSTNAME) {
-  goodOptions.reporters.loggly = [
-    {
-      module: 'good-squeeze',
-      name: 'Squeeze',
-      args: [
-        {
-          response: {
-            include: '*',
-            exclude: 'health'
-          }
+        engine: require('catbox-memory'),
+        options: {
+          maxByteSize: 1000000000, // ~ 1GB
         }
-      ]
-    },
-    {
-      module: require('good-loggly'),
-      args: [{
-        token: process.env.LOGGLY_TOKEN,
-        subdomain: process.env.LOGGLY_SUBDOMAIN,
-        tags: '*',
-        name: 'sophie build service',
-        hostname: process.env.LOGGLY_HOSTNAME,
-        threshold: 20,
-        maxDelay: 15000
-      }]
+      },
+    ],
+    routes: {
+      cors: true
     }
-  ]
+  });
+
+  server.app = {
+    cacheControl: 'public, max-age=43200, stale-while-revalidate=648000, stale-if-error=648000, s-maxage=3600'
+  };
+
+  await server.register({
+    plugin: require('./plugins/sophie-package-loader-github/index.js'),
+    options: {
+      githubUserName: process.env.GITHUB_USER_NAME,
+      githubAuthToken: process.env.GITHUB_AUTH_TOKEN
+    }
+  });
+
+  await server.register({
+    plugin: require('./plugins/sophie-bundle/index.js')
+  });
+
+  await server.register({
+    plugin: require('./plugins/sophie-bundle-css/index.js'),
+    options: {
+      tmpDir: path.join(__dirname, '/tmp')
+    }
+  });
+
+  await server.route(routes);
+
+  await server.start();
+
+  console.log('server running', server.info.uri);
 }
 
-const plugins = [
-  {
-    register: require('hapi-alive'),
-    options: {
-      path: '/health',
-      tags: ['health', 'monitor'],
-      healthCheck: function(server, callback) {
-        pusage.stat(process.pid, function(err, stat) {
-          if (err) {
-            return callback(err);
-          }
-          if (stat.cpu > 90) {
-            return callback(new Boom.internal('load is too high'));
-          }
-          if ((stat.memory / 1000000) > 1000) {
-            return callback(new Boom.internal('memory usage is too high'));
-          }
-          callback();
-        })
-      }
-    }
-  },
-  {
-    register: require('good'),
-    options: goodOptions
-  }
-];
-
-server.register(plugins, err => {
-  Hoek.assert(!err, err);
-
-  server.route(routes);
-
-  server.start(err => {
-    Hoek.assert(!err, err);
-    console.log('Server running at: ' + server.info.uri);
-  })
-});
+start();
