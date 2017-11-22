@@ -61,13 +61,13 @@ lab.experiment('bundle css', () => {
   it('returnes a compiled bundle for a package without dependencies', async () => {
     const response = await server.inject('/bundle/test-module2@^1.css');
     expect(response.statusCode).to.be.equal(200);
-    expect(response.result).to.be.equal('.test-module2__foo{color:"red"}\n');
+    expect(response.result).to.be.equal('.test-module2__bar{color:\"red\"}\n.test-module2__baz{color:\"red\"}\n.test-module2__foo{color:"red";background:green}\n');
   });
 
   it('returnes a compiled bundle for a package with dependencies', async () => {
     const response = await server.inject('/bundle/test-module1@^1.css');
     expect(response.statusCode).to.be.equal(200);
-    expect(response.result).to.be.equal('.test-module1{color:"black";background-color:"red"}\n');
+    expect(response.result).to.be.equal('.test-module1{color:#000;background-color:"red"}\n');
   });
 
   it('returnes a compiled bundle for a package with submodules defined', async () => {
@@ -85,7 +85,7 @@ lab.experiment('bundle css', () => {
   it('returnes a compiled bundle for a package with no sophie configuration in package.json', async () => {
     const response = await server.inject('/bundle/test-module3@^1.css');
     expect(response.statusCode).to.be.equal(200);
-    expect(response.result).to.be.equal('.test-module3{color:"green"}\n');
+    expect(response.result).to.be.equal('.test-module3{color:green}\n');
   });
 
   it('returnes a 500 error if a bundle fails to compile', async () => {
@@ -113,8 +113,8 @@ lab.experiment('bundle css', () => {
     const response2Promise = server.inject('/bundle/test-module1@^1.css');
     
     const responses = await Promise.all([response1Promise, response2Promise]);
-    expect(responses[0].result).to.be.equal('.test-module1{color:"black";background-color:"red"}\n');
-    expect(responses[1].result).to.be.equal('.test-module1{color:"black";background-color:"red"}\n');
+    expect(responses[0].result).to.be.equal('.test-module1{color:#000;background-color:"red"}\n');
+    expect(responses[1].result).to.be.equal('.test-module1{color:#000;background-color:"red"}\n');
 
     expect(existingBundleLoadingPromiseReturned).to.be.true();
     server.events.removeListener('log', listenForServerEvents);
@@ -126,6 +126,14 @@ lab.experiment('bundle css', () => {
     expect(response.result.message).to.be.equal('no generator for bundle type inexistingtype implemented');
   });
   
+});
+
+lab.experiment('bundle vars json', () => {
+  it('returnes a compiled vars json bundle for a package without dependencies', async () => {
+    const response = await server.inject('/bundle/test-module1@^1.vars.json');
+    expect(response.statusCode).to.be.equal(200);
+    expect(response.result).to.be.equal('{"main":{"test-color-primary-1":"#000"}}');
+  });
 });
 
 lab.experiment('server config', () => {

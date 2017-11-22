@@ -16,4 +16,10 @@ module.exports = [
       }
     }
   },
+  {
+    plugin: require('../plugins/sophie-bundle-vars-json/index.js'),
+    options: {
+      tmpDir: path.join(__dirname, '/tmp')
+    }
+  },
 ]

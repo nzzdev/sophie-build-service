@@ -25,6 +25,7 @@
     "hapi-alive": "^1.4.0",
     "node-fetch": "^1.5.3",
     "node-sass": "^4.5.2",
+    "node-sass-json-importer": "^3.0.2",
     "node-schedule": "^1.1.1",
     "nodegit": "^0.20.3",
     "pidusage": "^1.1.1",
