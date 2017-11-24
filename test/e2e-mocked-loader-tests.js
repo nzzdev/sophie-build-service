@@ -134,6 +134,24 @@ lab.experiment('bundle vars json', () => {
     expect(response.statusCode).to.be.equal(200);
     expect(response.result).to.be.equal('{"main":{"test-color-primary-1":"#000"}}');
   });
+
+  it('returnes a compiled vars json bundle for a package with submodules defined', async () => {
+    const response = await server.inject('/bundle/test-module1@^1[main].vars.json');
+    expect(response.statusCode).to.be.equal(200);
+    expect(response.result).to.be.equal('{"main":{"test-color-primary-1":"#000"}}');
+  });
+
+  it('returnes a compiled vars json bundle for a package with no sophie configuration in package.json', async () => {
+    const response = await server.inject('/bundle/test-module3@^1.vars.json');
+    expect(response.statusCode).to.be.equal(200);
+    expect(response.result).to.be.equal('{"vars":{"test-color-primary-3":\"green\"}}');
+  });
+
+  it('returnes a 404 error if an unexisting vars bundle is requests', async () => {
+    const response = await server.inject('/bundle/inexisting-module@^1.vars.json');
+    expect(response.statusCode).to.be.equal(404);
+    expect(response.result.message).to.be.equal('At least one requested module could not be found');
+  });
 });
 
 lab.experiment('server config', () => {
@@ -145,6 +163,16 @@ lab.experiment('server config', () => {
   
   it('returnes configured cache-control headers if given', async () => {
     const response = await serverWithCacheControl.inject('/bundle/test-module2@^1.css');
+    expect(response.headers['cache-control']).to.be.equal('public, max-age=43200, stale-while-revalidate=648000, stale-if-error=648000, s-maxage=3600');
+  });
+
+  it('returnes Cache-Control: no-cache if no cache config given', async () => {
+    const response = await server.inject('/bundle/test-module1@^1.vars.json');
+    expect(response.headers['cache-control']).to.be.equal('no-cache');
+  });
+  
+  it('returnes configured cache-control headers if given', async () => {
+    const response = await serverWithCacheControl.inject('/bundle/test-module1@^1.vars.json');
     expect(response.headers['cache-control']).to.be.equal('public, max-age=43200, stale-while-revalidate=648000, stale-if-error=648000, s-maxage=3600');
   });
 
