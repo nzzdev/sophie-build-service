@@ -7,7 +7,7 @@ const jsonImporter = require('node-sass-json-importer');
 
 const defaultServerMethodCaching = {
   expiresIn: 48 * 60 * 60 * 1000, // expire after 48 hours
-  staleIn: 1 * 60 * 15 * 1000, // rebuild bundles every 15 minutes on request
+  staleIn: 1 * 60 * 5 * 1000, // rebuild bundles every 5 minutes on request
   staleTimeout: 1, // do not wait before returning a stale bundle
   generateTimeout: 30 * 60 * 1000 // 30 minutes
 }
