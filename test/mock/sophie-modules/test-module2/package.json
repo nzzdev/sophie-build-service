@@ -6,6 +6,8 @@
     "node-sass": "^3.8.0"
   },
   "sophie": {
-    "mainCss": "foo.scss"
+    "dependencies": {
+      "test-module3": "^1"
+    }
   }
 }

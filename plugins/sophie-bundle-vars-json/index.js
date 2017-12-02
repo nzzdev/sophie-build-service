@@ -2,8 +2,6 @@ const fs = require('fs-extra');
 const path = require('path');
 const Hoek = require('hoek');
 const Boom = require('boom');
-const sass = require('node-sass');
-const jsonImporter = require('node-sass-json-importer');
 
 const defaultServerMethodCaching = {
   expiresIn: 48 * 60 * 60 * 1000, // expire after 48 hours
@@ -13,7 +11,7 @@ const defaultServerMethodCaching = {
 }
 
 module.exports = {
-  name: 'sophie-bundle-css',
+  name: 'sophie-bundle-vars-json',
   register: async function(server, options) {
 
     Hoek.assert(options.tmpDir, 'tmpDir is a required option');
@@ -22,55 +20,40 @@ module.exports = {
     const cacheConfig = Hoek.applyToDefaults(defaultServerMethodCaching, options.serverCacheConfig || {});
     // $lab:coverage:on$
 
-    server.method('sophie.generateBundle.css', async function(bundleId) {
+    server.method('sophie.generateBundle.vars_json', async function(bundleId) {
       const packages = server.methods.sophie.bundle.getPackagesFromBundleId(bundleId);
 
       await server.methods.sophie.loadPackages(packages, path.join(options.tmpDir, bundleId));
       server.log(['debug'], `got all packages ready at ${options.tmpDir}`);
 
-      let compiledStyles = '';
+      const compiledVars = {};
       for (const pack of packages) {
         const packageInfo = JSON.parse(fs.readFileSync(path.join(options.tmpDir, bundleId, pack.name, pack.version, 'package.json')));
         const sophiePackageInfo = packageInfo.sophie || {};
-  
+
         let filesToCompile = [];
         if (!pack.submodules) {
           // if no submodules are given, we compile all submodules
           // check if there is the scss directory first to not fail if a module has no submodules
-          const submodulePath = path.join(options.tmpDir, bundleId, pack.name, pack.version, 'scss');
-          if (fs.existsSync(submodulePath)) {
-            const submoduleFiles = fs.readdirSync(submodulePath);
-            filesToCompile = submoduleFiles.map(file => `scss/${file}`);
+          const submoduleVarsPath = path.join(options.tmpDir, bundleId, pack.name, pack.version, 'vars');
+          if (fs.existsSync(submoduleVarsPath)) {
+            const submoduleVarFiles = fs.readdirSync(submoduleVarsPath);
+            filesToCompile = submoduleVarFiles.map(file => `vars/${file}`);
           } else {
             // this is mostly a fallback for older style sophie modules that just have a main.scss file
-            filesToCompile = ['main.scss'];
+            filesToCompile = ['vars.json'];
           }
         } else {
-          filesToCompile = pack.submodules.map(sm => `scss/${sm}.scss`);
+          filesToCompile = pack.submodules.map(sm => `vars/${sm}.json`);
         }
   
         let fileName;
         while(fileName = filesToCompile.shift()) {
-          server.log(['debug'], `compiling styles ${fileName} of ${pack.name}`);
-          let rendered;
-          try {
-            rendered = sass.renderSync({
-              file: path.join(options.tmpDir, bundleId, pack.name, pack.version, fileName),
-              includePaths: [path.join(options.tmpDir, bundleId, pack.name, pack.version, 'sophie_packages')],
-              importer: [jsonImporter],
-              outputStyle: 'compressed'
-            });
-          } catch (err) {
-            throw Boom.badImplementation(`sass compilation error in package ${pack.name}@${pack.version} file ${fileName}: ${err.message}`);
-          }
-  
-          const styles = rendered.css.toString()
-          server.log(['debug'], `compiled styles ${fileName} of ${pack.name}`);
-          compiledStyles += styles;
+          compiledVars[fileName.replace('vars/', '').replace('.json', '')] = require(path.join(options.tmpDir, bundleId, pack.name, pack.version, fileName));
         }
       }
   
-      return compiledStyles;
+      return JSON.stringify(compiledVars);
     }, {
       cache: cacheConfig
     });
