@@ -109,7 +109,7 @@ module.exports = {
 
         timingInfo.loadTime = Date.now() - loadPackageStartTime;
 
-        server.log(['info'], {
+        server.log(['info', process.env.APP_ENV], {
           msg: 'sophie package loaded from github',
           release: satisfyingRelease,
           package: pack,
