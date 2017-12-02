@@ -57,6 +57,13 @@ async function start() {
   });
 
   await server.register({
+    plugin: require('./plugins/sophie-bundle-vars-json/index.js'),
+    options: {
+      tmpDir: path.join(__dirname, '/tmp')
+    }
+  });
+
+  await server.register({
     plugin: require('hapi-pino'),
     options: {
       prettyPrint: process.env.APP_ENV !== 'production' && process.env.APP_ENV !== 'staging',
