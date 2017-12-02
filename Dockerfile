@@ -16,5 +16,5 @@ COPY . /app
 EXPOSE 3000
 
 # Run node
-CMD node index.js | pino-socket -s ./pino-socket-config.json
+CMD node index.js | pino-socket -a PINO_SOCKET_ADDRESS -m PINO_SOCKET_MODE -p PINO_SOCKET_PORT
 
