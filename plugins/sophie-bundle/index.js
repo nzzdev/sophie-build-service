@@ -26,7 +26,7 @@ module.exports = {
           return bundle;
         });
       bundlesLoading[id] = generatePromise;
-      return bundlesLoading[id];
+      return generatePromise;
     });
 
     server.method('sophie.bundle.getPackagesFromBundleId', function(bundleId) {

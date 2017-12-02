@@ -62,7 +62,8 @@ async function start() {
       prettyPrint: process.env.APP_ENV !== 'production' && process.env.APP_ENV !== 'staging',
       ignorePaths: [
         '/health'
-      ]
+      ],
+      mergeHapiLogData: true
     }
   });
 
