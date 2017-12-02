@@ -2,7 +2,6 @@ const Hoek = require('hoek');
 const Boom = require('boom');
 const Hapi = require('hapi');
 const routes = require('./routes/routes.js')
-const pusage = require('pidusage');
 const path = require('path');
 
 async function start() {
@@ -17,13 +16,26 @@ async function start() {
       },
     ],
     routes: {
-      cors: true
+      cors: true,
+      files: {
+        relativeTo: path.join(__dirname, 'public')
+      }
     }
   });
 
+  const cacheControl = [
+    'public',
+    `max-age=${process.env.CACHE_CONTROL_MAX_AGE || 43200}`,
+    `max-age=${process.env.CACHE_CONTROL_STALE_WHILE_REVALIDATE || 648000}`,
+    `max-age=${process.env.CACHE_CONTROL_STALE_IF_ERROR || 648000}`,
+    `max-age=${process.env.CACHE_CONTROL_S_MAXAGE || 360}`
+  ]
+
   server.app = {
-    cacheControl: 'public, max-age=43200, stale-while-revalidate=648000, stale-if-error=648000, s-maxage=3600'
+    cacheControl: cacheControl.join(', ')
   };
+
+  await server.register(require('inert'));
 
   await server.register({
     plugin: require('./plugins/sophie-package-loader-github/index.js'),
@@ -44,7 +56,29 @@ async function start() {
     }
   });
 
-  await server.route(routes);
+  await server.register({
+    plugin: require('hapi-pino'),
+    options: {
+      prettyPrint: process.env.APP_ENV !== 'production' && process.env.APP_ENV !== 'staging',
+      ignorePaths: [
+        '/health'
+      ]
+    }
+  });
+
+  server.route(routes);
+
+  server.route({
+    method: 'GET',
+    path: '/{param*}',
+    handler: {
+      directory: {
+        path: '.',
+        redirectToSlash: true,
+        index: true,
+      }
+    }
+  });
 
   await server.start();
 
