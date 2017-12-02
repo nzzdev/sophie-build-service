@@ -27,7 +27,11 @@ module.exports = {
     });
 
     server.method('sophie.loadPackage', async function(pack, savePath) {
-      server.log(['debug'], `loading package ${pack.name}`);
+      server.log(['debug'], { msg: `loading package ${pack.name}` });
+
+      const loadPackageStartTime = Date.now();
+      const timingInfo = {};
+
       const repo = gh.getRepo('nzzdev', pack.name);
 
       let releases;
@@ -46,6 +50,8 @@ module.exports = {
         throw Boom.badRequest(`no satisfying version found for ${pack.name}@${pack.version}`);
       }
 
+      timingInfo.satisfyingReleaseFound = Date.now() - loadPackageStartTime;
+
       server.log(['debug'], `found satisfiying release ${pack.name}@${satisfyingRelease.name}`);
       server.log(['debug'], `going to fetch ${satisfyingRelease.tarball_url}`);
 
@@ -55,9 +61,11 @@ module.exports = {
           headers: {
             'Authorization': 'Basic ' + btoa(`${process.env.GITHUB_USER_NAME}:${process.env.GITHUB_AUTH_TOKEN}`),
           }
-        })
+        });
 
         server.log(['debug'], `loaded release tarball for ${pack.name}`);
+
+        timingInfo.releaseTarballLoaded = Date.now() - loadPackageStartTime;
 
         // clear the directory first
         await fs.emptyDir(savePath);
@@ -79,6 +87,8 @@ module.exports = {
             })
         });
 
+        timingInfo.releaseTarballUnpacked = Date.now() - loadPackageStartTime;
+
         // if there are any sophie dependencies, load them
         const packageInfo = JSON.parse(fs.readFileSync(path.join(savePath, 'package.json')));
         if (packageInfo.sophie && packageInfo.sophie.dependencies) {
@@ -93,10 +103,20 @@ module.exports = {
             loadDependenciesPromises.push(loadDepPromise);
           }
           await Promise.all(loadDependenciesPromises);
-          return pack;
-        } else {
-          return pack;
+
+          timingInfo.dependenciesLoaded = Date.now() - loadPackageStartTime;
         }
+
+        timingInfo.loadTime = Date.now() - loadPackageStartTime;
+
+        server.log(['info'], {
+          message: 'package loaded from github',
+          release: satisfyingRelease,
+          package: pack,
+          timing: timingInfo
+        });
+
+        return pack;
       } catch (err) {
         server.log(['debug'], 'failed to load from github, check if pack exists on disk');
         try {
