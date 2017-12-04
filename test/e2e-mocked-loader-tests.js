@@ -58,42 +58,42 @@ lab.experiment('basics', () => {
 
 lab.experiment('bundle css', () => {
   
-  it('returnes a compiled bundle for a package without dependencies', async () => {
+  it('returns a compiled bundle for a package without dependencies', async () => {
     const response = await server.inject('/bundle/test-module2@^1.css');
     expect(response.statusCode).to.be.equal(200);
     expect(response.result).to.be.equal('.test-module2__bar{color:\"red\"}\n.test-module2__baz{color:\"red\"}\n.test-module2__foo{color:"red";background:green}\n');
   });
 
-  it('returnes a compiled bundle for a package with dependencies', async () => {
+  it('returns a compiled bundle for a package with dependencies', async () => {
     const response = await server.inject('/bundle/test-module1@^1.css');
     expect(response.statusCode).to.be.equal(200);
     expect(response.result).to.be.equal('.test-module1{color:#000;background-color:"red"}\n');
   });
 
-  it('returnes a compiled bundle for a package with submodules defined', async () => {
+  it('returns a compiled bundle for a package with submodules defined', async () => {
     const response = await server.inject('/bundle/test-module2@^1[bar].css');
     expect(response.statusCode).to.be.equal(200);
     expect(response.result).to.be.equal('.test-module2__bar{color:"red"}\n');
   });
 
-  it('returnes a compiled bundle for a package with multiple submodules defined', async () => {
+  it('returns a compiled bundle for a package with multiple submodules defined', async () => {
     const response = await server.inject('/bundle/test-module2@^1[bar+baz].css');
     expect(response.statusCode).to.be.equal(200);
     expect(response.result).to.be.equal('.test-module2__bar{color:"red"}\n.test-module2__baz{color:"red"}\n');
   });
 
-  it('returnes a compiled bundle for a package with no sophie configuration in package.json', async () => {
+  it('returns a compiled bundle for a package with no sophie configuration in package.json', async () => {
     const response = await server.inject('/bundle/test-module3@^1.css');
     expect(response.statusCode).to.be.equal(200);
     expect(response.result).to.be.equal('.test-module3{color:green}\n');
   });
 
-  it('returnes a 500 error if a bundle fails to compile', async () => {
+  it('returns a 500 error if a bundle fails to compile', async () => {
     const response = await server.inject('/bundle/test-module4@^1.css');
     expect(response.statusCode).to.be.equal(500);
   });
 
-  it('returnes a 404 error if an unexisting bundle is requests', async () => {
+  it('returns a 404 error if an unexisting bundle is requests', async () => {
     const response = await server.inject('/bundle/inexisting-module@^1.css');
     expect(response.statusCode).to.be.equal(404);
     expect(response.result.message).to.be.equal('At least one requested module could not be found');
@@ -120,7 +120,7 @@ lab.experiment('bundle css', () => {
     server.events.removeListener('log', listenForServerEvents);
   });
 
-  it ('returnes an error if no generator server method is defined for given bundle type', async () => {
+  it ('returns an error if no generator server method is defined for given bundle type', async () => {
     const response = await server.inject('/bundle/test-module@^1.inexistingtype');
     expect(response.statusCode).to.be.equal(501);
     expect(response.result.message).to.be.equal('no generator for bundle type inexistingtype implemented');
@@ -129,25 +129,25 @@ lab.experiment('bundle css', () => {
 });
 
 lab.experiment('bundle vars json', () => {
-  it('returnes a compiled vars json bundle for a package without dependencies', async () => {
+  it('returns a compiled vars json bundle for a package without dependencies', async () => {
     const response = await server.inject('/bundle/test-module1@^1.vars.json');
     expect(response.statusCode).to.be.equal(200);
     expect(response.result).to.be.equal('{"main":{"test-color-primary-1":"#000"}}');
   });
 
-  it('returnes a compiled vars json bundle for a package with submodules defined', async () => {
+  it('returns a compiled vars json bundle for a package with submodules defined', async () => {
     const response = await server.inject('/bundle/test-module1@^1[main].vars.json');
     expect(response.statusCode).to.be.equal(200);
     expect(response.result).to.be.equal('{"main":{"test-color-primary-1":"#000"}}');
   });
 
-  it('returnes a compiled vars json bundle for a package with no sophie configuration in package.json', async () => {
+  it('returns a compiled vars json bundle for a package with no sophie configuration in package.json', async () => {
     const response = await server.inject('/bundle/test-module3@^1.vars.json');
     expect(response.statusCode).to.be.equal(200);
     expect(response.result).to.be.equal('{"vars":{"test-color-primary-3":\"green\"}}');
   });
 
-  it('returnes a 404 error if an unexisting vars bundle is requests', async () => {
+  it('returns a 404 error if an unexisting vars bundle is requests', async () => {
     const response = await server.inject('/bundle/inexisting-module@^1.vars.json');
     expect(response.statusCode).to.be.equal(404);
     expect(response.result.message).to.be.equal('At least one requested module could not be found');
@@ -156,22 +156,22 @@ lab.experiment('bundle vars json', () => {
 
 lab.experiment('server config', () => {
 
-  it('returnes Cache-Control: no-cache if no cache config given', async () => {
+  it('returns Cache-Control: no-cache if no cache config given', async () => {
     const response = await server.inject('/bundle/test-module2@^1.css');
     expect(response.headers['cache-control']).to.be.equal('no-cache');
   });
   
-  it('returnes configured cache-control headers if given', async () => {
+  it('returns configured cache-control headers if given', async () => {
     const response = await serverWithCacheControl.inject('/bundle/test-module2@^1.css');
     expect(response.headers['cache-control']).to.be.equal('public, max-age=43200, stale-while-revalidate=648000, stale-if-error=648000, s-maxage=3600');
   });
 
-  it('returnes Cache-Control: no-cache if no cache config given', async () => {
+  it('returns Cache-Control: no-cache if no cache config given', async () => {
     const response = await server.inject('/bundle/test-module1@^1.vars.json');
     expect(response.headers['cache-control']).to.be.equal('no-cache');
   });
   
-  it('returnes configured cache-control headers if given', async () => {
+  it('returns configured cache-control headers if given', async () => {
     const response = await serverWithCacheControl.inject('/bundle/test-module1@^1.vars.json');
     expect(response.headers['cache-control']).to.be.equal('public, max-age=43200, stale-while-revalidate=648000, stale-if-error=648000, s-maxage=3600');
   });
