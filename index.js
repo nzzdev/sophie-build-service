@@ -25,10 +25,10 @@ async function start() {
 
   const cacheControl = [
     'public',
-    `max-age=${process.env.CACHE_CONTROL_MAX_AGE || 43200}`,
-    `max-age=${process.env.CACHE_CONTROL_STALE_WHILE_REVALIDATE || 648000}`,
-    `max-age=${process.env.CACHE_CONTROL_STALE_IF_ERROR || 648000}`,
-    `max-age=${process.env.CACHE_CONTROL_S_MAXAGE || 360}`
+    `max-age=${process.env.CACHE_CONTROL_MAX_AGE || 43200}`, // 12 hours
+    `max-age=${process.env.CACHE_CONTROL_STALE_WHILE_REVALIDATE || 604800}`, // 7 days
+    `max-age=${process.env.CACHE_CONTROL_STALE_IF_ERROR || 604800}`, // 7 days
+    `max-age=${process.env.CACHE_CONTROL_S_MAXAGE || 300}` // 5 minutes
   ]
 
   server.app = {
