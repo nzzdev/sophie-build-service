@@ -16,7 +16,7 @@ Set these ENV variables to enable logging: `PINO_SOCKET_ADDRESS`, `PINO_SOCKET_M
 Sophie modules follow this versioning scheme: `public-bc.internal-bc.feature` for example `1.2.0` where
 - `public-bc`: bumped if there is a bc breaking change in the public styles (css or json) of the package (e.g. things removed, drastic changes)
 - `internal-bc`: bumped if there is a change in the internal structure that could make depending sophie modules break
-- `feature`: bumped in all other cases e.g. a things is added without chaning existing structure
+- `feature`: bumped in all other cases e.g. a thing is added without changing existing structure
 
 This enables usage like this:
 - bundles are requested with the first number pinned e.g. sophie-color@1
