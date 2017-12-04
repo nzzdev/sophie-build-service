@@ -3,17 +3,17 @@ const Boom = require('boom');
 module.exports = [
   {
     method: ['GET', 'OPTIONS'],
-    path: '/bundle/{bundleId}.css',
+    path: '/bundle/{bundleId}.vars.json',
     handler: async function(request, h) {
-      let styles;
+      let varsJson;
       try {
-        styles = await request.server.methods.sophie.bundle.load(request.params.bundleId, 'css');
+        varsJson = await request.server.methods.sophie.bundle.load(request.params.bundleId, 'vars_json');
       } catch (err) {
         request.server.log(['error'], err.message);
         throw err;
       }
 
-      const response = h.response(styles).type('text/css');
+      const response = h.response(varsJson).type('text/json');
 
       if (request.server.settings.app && request.server.settings.app.cacheControl) {
         response.header('cache-control', request.server.settings.app.cacheControl);

@@ -1,18 +1,13 @@
 # Use following version of Node as the base image
-FROM node:7
+FROM node:9.2
 
 # Set work directory for run/cmd
 WORKDIR /app
 
-ARG GITHUB_USER_NAME
-ENV GITHUB_USER_NAME ${GITHUB_USER_NAME}
-
-ARG GITHUB_AUTH_TOKEN
-ENV GITHUB_AUTH_TOKEN ${GITHUB_AUTH_TOKEN}
-
 # Copy package.json into work directory and install dependencies
 COPY package.json /app/package.json
 RUN npm install
+RUN npm install -g pino-socket
 
 # Copy everthing else in work directory
 COPY . /app
@@ -21,4 +16,5 @@ COPY . /app
 EXPOSE 3000
 
 # Run node
-CMD ["node", "/app/index.js"]
+CMD node index.js | pino-socket -a $PINO_SOCKET_ADDRESS -m $PINO_SOCKET_MODE -p $PINO_SOCKET_PORT
+

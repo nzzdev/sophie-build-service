@@ -1,0 +1,7 @@
+@import "vars.scss";
+@import "test-module3/vars.json";
+
+.test-module2__foo {
+  color: $test-color-primary-2;
+  background: $test-color-primary-3;
+}
