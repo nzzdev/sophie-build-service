@@ -59,9 +59,9 @@ lab.experiment('basics', () => {
 lab.experiment('bundle css', () => {
   
   it('returns a compiled bundle for a package without dependencies', async () => {
-    const response = await server.inject('/bundle/test-module2@^1.css');
+    const response = await server.inject('/bundle/test-module3@^1.css');
     expect(response.statusCode).to.be.equal(200);
-    expect(response.result).to.be.equal('.test-module2__bar{color:\"red\"}\n.test-module2__baz{color:\"red\"}\n.test-module2__foo{color:"red";background:green}\n');
+    expect(response.result).to.be.equal('.test-module3{color:green}\n');
   });
 
   it('returns a compiled bundle for a package with dependencies', async () => {
@@ -129,12 +129,6 @@ lab.experiment('bundle css', () => {
 });
 
 lab.experiment('bundle vars json', () => {
-  it('returns a compiled vars json bundle for a package without dependencies', async () => {
-    const response = await server.inject('/bundle/test-module1@^1.vars.json');
-    expect(response.statusCode).to.be.equal(200);
-    expect(response.result).to.be.equal('{"main":{"test-color-primary-1":"#000"}}');
-  });
-
   it('returns a compiled vars json bundle for a package with submodules defined', async () => {
     const response = await server.inject('/bundle/test-module1@^1[main].vars.json');
     expect(response.statusCode).to.be.equal(200);
