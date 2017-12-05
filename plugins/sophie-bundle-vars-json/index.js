@@ -28,6 +28,8 @@ module.exports = {
 
       const compiledVars = {};
       for (const pack of packages) {
+        compiledVars[pack.name] = {};
+
         const packageInfo = JSON.parse(fs.readFileSync(path.join(options.tmpDir, bundleId, pack.name, pack.version, 'package.json')));
         const sophiePackageInfo = packageInfo.sophie || {};
 
@@ -49,7 +51,7 @@ module.exports = {
   
         let fileName;
         while(fileName = filesToCompile.shift()) {
-          compiledVars[fileName.replace('vars/', '').replace('.json', '')] = require(path.join(options.tmpDir, bundleId, pack.name, pack.version, fileName));
+          compiledVars[pack.name][fileName.replace('vars/', '').replace('.json', '')] = require(path.join(options.tmpDir, bundleId, pack.name, pack.version, fileName));
         }
       }
   

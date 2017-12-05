@@ -132,13 +132,13 @@ lab.experiment('bundle vars json', () => {
   it('returns a compiled vars json bundle for a package with submodules defined', async () => {
     const response = await server.inject('/bundle/test-module1@^1[main].vars.json');
     expect(response.statusCode).to.be.equal(200);
-    expect(response.result).to.be.equal('{"main":{"test-color-primary-1":"#000"}}');
+    expect(response.result).to.be.equal('{"test-module1":{"main":{"test-color-primary-1":"#000"}}}');
   });
 
   it('returns a compiled vars json bundle for a package with no sophie configuration in package.json', async () => {
     const response = await server.inject('/bundle/test-module3@^1.vars.json');
     expect(response.statusCode).to.be.equal(200);
-    expect(response.result).to.be.equal('{"vars":{"test-color-primary-3":\"green\"}}');
+    expect(response.result).to.be.equal('{"test-module3":{"vars":{"test-color-primary-3":\"green\"}}}');
   });
 
   it('returns a 404 error if an unexisting vars bundle is requests', async () => {
