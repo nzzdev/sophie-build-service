@@ -38,6 +38,7 @@ module.exports = {
       try {
         releases = await repo.listReleases();
       } catch (err) {
+        server.log(['error'], { msg: `loading release list from github failed for ${pack.name}: ${err.message}` });
         if (err.response.status === 404) {
           throw Boom.notFound('At least one requested module could not be found');
         }
@@ -63,6 +64,11 @@ module.exports = {
           }
         });
 
+        if (!response.ok) {
+          server.log(['error'], `failed to load tarball from github for ${pack.name}: ${response.statusText}`);
+          throw new Error(`failed to load tarball, github responded with ${response.status}`);
+        }
+
         server.log(['debug'], `loaded release tarball for ${pack.name}`);
 
         timingInfo.releaseTarballLoaded = Date.now() - loadPackageStartTime;
@@ -78,7 +84,7 @@ module.exports = {
               strip: 1
             }))
             .on('error', err => {
-              server.log(['debug'], `failed to extract ${pack.name}: ${err}`)
+              server.log(['error'], `failed to extract ${pack.name}: ${err}`)
               reject(err);
             })
             .on('end', () => {
@@ -118,7 +124,7 @@ module.exports = {
 
         return pack;
       } catch (err) {
-        server.log(['debug'], 'failed to load from github, check if pack exists on disk');
+        server.log(['info'], 'failed to load from github, check if pack exists on disk');
         try {
           if (fs.readdirSync(savePath).length > 1) {
             server.log(['debug'], 'pack exists on disk');
@@ -127,7 +133,7 @@ module.exports = {
             throw new Error(`failed to load package ${pack.name}`);
           }
         } catch (err) {
-          server.log(['debug'], 'pack does not exist on disk. this will fail bad');
+          server.log(['error'], 'pack does not exist on disk. this will fail bad');
           throw new Error(`failed to load package ${pack.name}`);
         }
       }
