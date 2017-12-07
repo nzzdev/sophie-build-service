@@ -4,6 +4,14 @@ const Hapi = require('hapi');
 const routes = require('./routes/routes.js')
 const path = require('path');
 
+const cacheControl = [
+  'public',
+  `max-age=${process.env.CACHE_CONTROL_MAX_AGE || 43200}`, // 12 hours
+  `stale-while-revalidate=${process.env.CACHE_CONTROL_STALE_WHILE_REVALIDATE || 604800}`, // 7 days
+  `stale-if-error=${process.env.CACHE_CONTROL_STALE_IF_ERROR || 604800}`, // 7 days
+  `s-maxage=${process.env.CACHE_CONTROL_S_MAXAGE || 300}` // 5 minutes
+]
+
 async function start() {
   const server = Hapi.server({
     port: process.env.PORT || 3000,
@@ -20,20 +28,11 @@ async function start() {
       files: {
         relativeTo: path.join(__dirname, 'public')
       }
+    },
+    app: {
+      cacheControl: cacheControl.join(', ')
     }
   });
-
-  const cacheControl = [
-    'public',
-    `max-age=${process.env.CACHE_CONTROL_MAX_AGE || 43200}`, // 12 hours
-    `max-age=${process.env.CACHE_CONTROL_STALE_WHILE_REVALIDATE || 604800}`, // 7 days
-    `max-age=${process.env.CACHE_CONTROL_STALE_IF_ERROR || 604800}`, // 7 days
-    `max-age=${process.env.CACHE_CONTROL_S_MAXAGE || 300}` // 5 minutes
-  ]
-
-  server.app = {
-    cacheControl: cacheControl.join(', ')
-  };
 
   await server.register(require('inert'));
 
