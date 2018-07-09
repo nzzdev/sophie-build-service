@@ -48,6 +48,9 @@ module.exports = {
         } else if (p.includes("#")) {
           sophiePackage.name = p.split("[")[0].split("#")[0];
           sophiePackage.branch = p.split("[")[0].split("#")[1];
+        } else if (p.includes("%23")) {
+          sophiePackage.name = p.split("[")[0].split("%23")[0];
+          sophiePackage.branch = p.split("[")[0].split("%23")[1];
         }
         sophiePackage.submodules =
           typeof submodules === "string" ? submodules.split("+") : undefined;
