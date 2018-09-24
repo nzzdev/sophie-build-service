@@ -13,9 +13,6 @@ node_js:
 - '9'
 install:
 - npm install
-cache:
-  directories:
-  - node_modules
 before_script:
 - DOCKER_IMAGE_NAME="sophie-build-service"
 - DOCKER_TAG=$TRAVIS_BRANCH
@@ -29,6 +26,3 @@ after_success:
   CATTLE_ACCESS_KEY -e CATTLE_SECRET_KEY etlweather/gaucho upgrade $RANCHER_SERVICE_ID_STAGING
   --auto_complete --start_first --imageUuid="docker:nzzonline/$DOCKER_IMAGE_NAME:$DOCKER_TAG" || true; 
   fi
-cache:
-  directories:
-  - node_modules
