@@ -1,7 +1,5 @@
 const Lab = require("lab");
 const Code = require("code");
-const Hapi = require("hapi");
-const Boom = require("boom");
 const lab = (exports.lab = Lab.script());
 
 const expect = Code.expect;
@@ -9,11 +7,8 @@ const before = lab.before;
 const after = lab.after;
 const it = lab.it;
 
-const package = require("../package.json");
-
 let server = require("./server.js").getServer();
 const plugins = require("./plugins.js");
-const routes = require("../routes/routes.js");
 
 before(async () => {
   try {
