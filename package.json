@@ -1,11 +1,8 @@
 {
   "name": "sophie-build-service",
-  "version": "2.1.1",
+  "version": "2.2.0",
   "description": "Sophie Build Service",
   "main": "index.js",
-  "engines": {
-    "node": "9.2"
-  },
   "scripts": {
     "test": "lab -a code -t 100 -c -P tests --verbose --leaks"
   },
