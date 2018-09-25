@@ -1,7 +1,7 @@
 const fs = require("fs-extra");
 const path = require("path");
 const Hoek = require("hoek");
-const Boom = require("boom");
+const crypto = require("crypto");
 
 const defaultServerMethodCaching = {
   expiresIn: 48 * 60 * 60 * 1000, // expire after 48 hours
@@ -28,10 +28,14 @@ module.exports = {
         const packages = server.methods.sophie.bundle.getPackagesFromBundleId(
           bundleId
         );
+        const packagesHash = crypto
+          .createHash("md5")
+          .update(bundleId)
+          .digest("hex");
 
         await server.methods.sophie.loadPackages(
           packages,
-          path.join(options.tmpDir, bundleId)
+          path.join(options.tmpDir, packagesHash)
         );
         server.log(["debug"], `got all packages ready at ${options.tmpDir}`);
 
@@ -43,7 +47,7 @@ module.exports = {
             fs.readFileSync(
               path.join(
                 options.tmpDir,
-                bundleId,
+                packagesHash,
                 pack.name,
                 pack.version || pack.branch,
                 "package.json"
@@ -58,7 +62,7 @@ module.exports = {
             // check if there is the scss directory first to not fail if a module has no submodules
             const submoduleVarsPath = path.join(
               options.tmpDir,
-              bundleId,
+              packagesHash,
               pack.name,
               pack.version || pack.branch,
               "vars"
@@ -80,7 +84,7 @@ module.exports = {
               fileName.replace("vars/", "").replace(".json", "")
             ] = require(path.join(
               options.tmpDir,
-              bundleId,
+              packagesHash,
               pack.name,
               pack.version || pack.branch,
               fileName

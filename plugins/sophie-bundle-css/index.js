@@ -4,6 +4,7 @@ const Hoek = require("hoek");
 const Boom = require("boom");
 const sass = require("node-sass");
 const jsonImporter = require("node-sass-json-importer");
+const crypto = require("crypto");
 
 const defaultServerMethodCaching = {
   expiresIn: 48 * 60 * 60 * 1000, // expire after 48 hours
@@ -30,10 +31,14 @@ module.exports = {
         const packages = server.methods.sophie.bundle.getPackagesFromBundleId(
           bundleId
         );
+        const packagesHash = crypto
+          .createHash("md5")
+          .update(bundleId)
+          .digest("hex");
 
         await server.methods.sophie.loadPackages(
           packages,
-          path.join(options.tmpDir, bundleId)
+          path.join(options.tmpDir, packagesHash)
         );
         server.log(["debug"], `got all packages ready at ${options.tmpDir}`);
 
@@ -43,7 +48,7 @@ module.exports = {
             fs.readFileSync(
               path.join(
                 options.tmpDir,
-                bundleId,
+                packagesHash,
                 pack.name,
                 pack.version || pack.branch,
                 "package.json"
@@ -58,7 +63,7 @@ module.exports = {
             // check if there is the scss directory first to not fail if a module has no submodules
             const submodulePath = path.join(
               options.tmpDir,
-              bundleId,
+              packagesHash,
               pack.name,
               pack.version || pack.branch,
               "scss"
@@ -85,7 +90,7 @@ module.exports = {
               rendered = sass.renderSync({
                 file: path.join(
                   options.tmpDir,
-                  bundleId,
+                  packagesHash,
                   pack.name,
                   pack.version || pack.branch,
                   fileName
@@ -93,7 +98,7 @@ module.exports = {
                 includePaths: [
                   path.join(
                     options.tmpDir,
-                    bundleId,
+                    packagesHash,
                     pack.name,
                     pack.version || pack.branch,
                     "sophie_packages"
