@@ -48,7 +48,7 @@ module.exports = {
             fs.readFileSync(
               path.join(
                 options.tmpDir,
-                bundleId,
+                packagesHash,
                 pack.name,
                 pack.version || pack.branch,
                 "package.json"
@@ -63,7 +63,7 @@ module.exports = {
             // check if there is the scss directory first to not fail if a module has no submodules
             const submodulePath = path.join(
               options.tmpDir,
-              bundleId,
+              packagesHash,
               pack.name,
               pack.version || pack.branch,
               "scss"
@@ -90,7 +90,7 @@ module.exports = {
               rendered = sass.renderSync({
                 file: path.join(
                   options.tmpDir,
-                  bundleId,
+                  packagesHash,
                   pack.name,
                   pack.version || pack.branch,
                   fileName
@@ -98,7 +98,7 @@ module.exports = {
                 includePaths: [
                   path.join(
                     options.tmpDir,
-                    bundleId,
+                    packagesHash,
                     pack.name,
                     pack.version || pack.branch,
                     "sophie_packages"

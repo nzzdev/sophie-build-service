@@ -47,7 +47,7 @@ module.exports = {
             fs.readFileSync(
               path.join(
                 options.tmpDir,
-                bundleId,
+                packagesHash,
                 pack.name,
                 pack.version || pack.branch,
                 "package.json"
@@ -62,7 +62,7 @@ module.exports = {
             // check if there is the scss directory first to not fail if a module has no submodules
             const submoduleVarsPath = path.join(
               options.tmpDir,
-              bundleId,
+              packagesHash,
               pack.name,
               pack.version || pack.branch,
               "vars"
@@ -84,7 +84,7 @@ module.exports = {
               fileName.replace("vars/", "").replace(".json", "")
             ] = require(path.join(
               options.tmpDir,
-              bundleId,
+              packagesHash,
               pack.name,
               pack.version || pack.branch,
               fileName
