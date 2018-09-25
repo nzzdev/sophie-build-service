@@ -32,11 +32,9 @@ module.exports = {
           .createHash("md5")
           .update(bundleId)
           .digest("hex");
+        const pathPrefix = path.join(options.tmpDir, packagesHash);
 
-        await server.methods.sophie.loadPackages(
-          packages,
-          path.join(options.tmpDir, packagesHash)
-        );
+        await server.methods.sophie.loadPackages(packages, pathPrefix);
         server.log(["debug"], `got all packages ready at ${options.tmpDir}`);
 
         const compiledVars = {};
@@ -46,8 +44,7 @@ module.exports = {
           const packageInfo = JSON.parse(
             fs.readFileSync(
               path.join(
-                options.tmpDir,
-                packagesHash,
+                pathPrefix,
                 pack.name,
                 pack.version || pack.branch,
                 "package.json"
@@ -61,8 +58,7 @@ module.exports = {
             // if no submodules are given, we compile all submodules
             // check if there is the scss directory first to not fail if a module has no submodules
             const submoduleVarsPath = path.join(
-              options.tmpDir,
-              packagesHash,
+              pathPrefix,
               pack.name,
               pack.version || pack.branch,
               "vars"
@@ -83,8 +79,7 @@ module.exports = {
             compiledVars[pack.name][
               fileName.replace("vars/", "").replace(".json", "")
             ] = require(path.join(
-              options.tmpDir,
-              packagesHash,
+              pathPrefix,
               pack.name,
               pack.version || pack.branch,
               fileName

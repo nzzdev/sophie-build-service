@@ -35,11 +35,9 @@ module.exports = {
           .createHash("md5")
           .update(bundleId)
           .digest("hex");
+        const pathPrefix = path.join(options.tmpDir, packagesHash);
 
-        await server.methods.sophie.loadPackages(
-          packages,
-          path.join(options.tmpDir, packagesHash)
-        );
+        await server.methods.sophie.loadPackages(packages, pathPrefix);
         server.log(["debug"], `got all packages ready at ${options.tmpDir}`);
 
         let compiledStyles = "";
@@ -47,8 +45,7 @@ module.exports = {
           const packageInfo = JSON.parse(
             fs.readFileSync(
               path.join(
-                options.tmpDir,
-                packagesHash,
+                pathPrefix,
                 pack.name,
                 pack.version || pack.branch,
                 "package.json"
@@ -62,8 +59,7 @@ module.exports = {
             // if no submodules are given, we compile all submodules
             // check if there is the scss directory first to not fail if a module has no submodules
             const submodulePath = path.join(
-              options.tmpDir,
-              packagesHash,
+              pathPrefix,
               pack.name,
               pack.version || pack.branch,
               "scss"
@@ -89,16 +85,14 @@ module.exports = {
             try {
               rendered = sass.renderSync({
                 file: path.join(
-                  options.tmpDir,
-                  packagesHash,
+                  pathPrefix,
                   pack.name,
                   pack.version || pack.branch,
                   fileName
                 ),
                 includePaths: [
                   path.join(
-                    options.tmpDir,
-                    packagesHash,
+                    pathPrefix,
                     pack.name,
                     pack.version || pack.branch,
                     "sophie_packages"
