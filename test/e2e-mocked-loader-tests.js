@@ -56,21 +56,21 @@ lab.experiment("bundle css", () => {
   it("returns a compiled bundle for a package without dependencies", async () => {
     const response = await server.inject("/bundle/test-module3%23master.css");
     expect(response.statusCode).to.be.equal(200);
-    expect(response.result).to.be.equal(".test-module3{color:green}\n");
+    expect(response.result).to.be.equal(".test-module3{color:green}");
   });
 
   it("returns a compiled bundle for a package with dependencies", async () => {
     const response = await server.inject("/bundle/test-module1@^1.css");
     expect(response.statusCode).to.be.equal(200);
     expect(response.result).to.be.equal(
-      '.test-module1{color:#000;background-color:"red"}\n'
+      '.test-module1{color:#000;background-color:"red"}'
     );
   });
 
   it("returns a compiled bundle for a package with submodules defined", async () => {
     const response = await server.inject("/bundle/test-module2@^1[bar].css");
     expect(response.statusCode).to.be.equal(200);
-    expect(response.result).to.be.equal('.test-module2__bar{color:"red"}\n');
+    expect(response.result).to.be.equal('.test-module2__bar{color:"red"}');
   });
 
   it("returns a compiled bundle for a package with multiple submodules defined", async () => {
@@ -79,14 +79,14 @@ lab.experiment("bundle css", () => {
     );
     expect(response.statusCode).to.be.equal(200);
     expect(response.result).to.be.equal(
-      '.test-module2__bar{color:"red"}\n.test-module2__baz{color:"red"}\n'
+      '.test-module2__bar{color:"red"}.test-module2__baz{color:"red"}'
     );
   });
 
   it("returns a compiled bundle for a package with no sophie configuration in package.json", async () => {
     const response = await server.inject("/bundle/test-module3@^1.css");
     expect(response.statusCode).to.be.equal(200);
-    expect(response.result).to.be.equal(".test-module3{color:green}\n");
+    expect(response.result).to.be.equal(".test-module3{color:green}");
   });
 
   it("returns a 500 error if a bundle fails to compile", async () => {
@@ -122,10 +122,10 @@ lab.experiment("bundle css", () => {
 
       const responses = await Promise.all([response1Promise, response2Promise]);
       expect(responses[0].result).to.be.equal(
-        '.test-module1{color:#000;background-color:"red"}\n'
+        '.test-module1{color:#000;background-color:"red"}'
       );
       expect(responses[1].result).to.be.equal(
-        '.test-module1{color:#000;background-color:"red"}\n'
+        '.test-module1{color:#000;background-color:"red"}'
       );
 
       expect(existingBundleLoadingPromiseReturned).to.be.true();

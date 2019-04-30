@@ -2,7 +2,7 @@ const fs = require("fs-extra");
 const path = require("path");
 const Hoek = require("@hapi/hoek");
 const Boom = require("@hapi/boom");
-const sass = require("node-sass");
+const sass = require("sass");
 const jsonImporter = require("node-sass-json-importer");
 const crypto = require("crypto");
 
