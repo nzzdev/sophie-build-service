@@ -1,4 +1,4 @@
-const Boom = require("boom");
+const Boom = require("@hapi/boom");
 const fs = require("fs-extra");
 const path = require("path");
 const btoa = require("btoa");

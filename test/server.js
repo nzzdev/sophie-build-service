@@ -1,13 +1,15 @@
-const Hapi = require("hapi");
+const Hapi = require("@hapi/hapi");
 
 function getServer() {
   let server = Hapi.server({
     port: process.env.PORT || 3000,
     cache: [
       {
-        engine: require("catbox-memory"),
-        options: {
-          maxByteSize: 1000000000 // ~ 1GB
+        provider: {
+          constructor: require("@hapi/catbox-memory"),
+          options: {
+            maxByteSize: 1000000000 // ~ 1GB
+          }
         }
       }
     ],
@@ -23,9 +25,11 @@ function getServerWithCacheControl() {
     port: process.env.PORT || 3001,
     cache: [
       {
-        engine: require("catbox-memory"),
-        options: {
-          maxByteSize: 1000000000 // ~ 1GB
+        provider: {
+          constructor: require("@hapi/catbox-memory"),
+          options: {
+            maxByteSize: 1000000000 // ~ 1GB
+          }
         }
       }
     ],
