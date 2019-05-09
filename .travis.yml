@@ -18,7 +18,7 @@ install:
   - npm install
 before_script:
   - DOCKER_IMAGE_NAME="sophie-build-service"
-  - DOCKER_TAG=${TRAVIS_BRANCH/\//_}
+  - DOCKER_TAG=${TRAVIS_BRANCH//\//_}
 script:
   - npm run test
   - 'if [ "$TRAVIS_PULL_REQUEST" = "false" ]; then docker build -t $DOCKER_IMAGE_NAME:$DOCKER_TAG .; fi'
