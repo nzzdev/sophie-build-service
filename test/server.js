@@ -1,18 +1,18 @@
 const Hapi = require("@hapi/hapi");
 
-function getServer() {
+const cacheConfig = {
+  provider: {
+    constructor: require("@hapi/catbox-memory"),
+    options: {
+      maxByteSize: 1000000000 // ~ 1GB
+    }
+  }
+};
+
+function getServerWithoutAppConfig() {
   let server = Hapi.server({
     port: process.env.PORT || 3000,
-    cache: [
-      {
-        provider: {
-          constructor: require("@hapi/catbox-memory"),
-          options: {
-            maxByteSize: 1000000000 // ~ 1GB
-          }
-        }
-      }
-    ],
+    cache: [cacheConfig],
     routes: {
       cors: true
     }
@@ -20,19 +20,22 @@ function getServer() {
   return server;
 }
 
-function getServerWithCacheControl() {
+function getServerWithEmptyAppConfig() {
   let server = Hapi.server({
     port: process.env.PORT || 3001,
-    cache: [
-      {
-        provider: {
-          constructor: require("@hapi/catbox-memory"),
-          options: {
-            maxByteSize: 1000000000 // ~ 1GB
-          }
-        }
-      }
-    ],
+    cache: [cacheConfig],
+    routes: {
+      cors: true
+    },
+    app: {}
+  });
+  return server;
+}
+
+function getServerWithCacheControl() {
+  let server = Hapi.server({
+    port: process.env.PORT || 3002,
+    cache: [cacheConfig],
     routes: {
       cors: true
     },
@@ -44,5 +47,8 @@ function getServerWithCacheControl() {
   return server;
 }
 
-module.exports.getServer = getServer;
-module.exports.getServerWithCacheControl = getServerWithCacheControl;
+module.exports = {
+  getServerWithoutAppConfig,
+  getServerWithEmptyAppConfig,
+  getServerWithCacheControl
+};

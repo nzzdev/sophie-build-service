@@ -7,7 +7,7 @@ const before = lab.before;
 const after = lab.after;
 const it = lab.it;
 
-let server = require("./server.js").getServer();
+let server = require("./server.js").getServerWithoutAppConfig();
 const plugins = require("./plugins.js");
 
 before(async () => {

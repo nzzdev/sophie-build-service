@@ -7,7 +7,8 @@ const before = lab.before;
 const after = lab.after;
 const it = lab.it;
 
-let server = require("./server.js").getServer();
+let server = require("./server.js").getServerWithoutAppConfig();
+let serverWithEmptyAppConfig = require("./server.js").getServerWithEmptyAppConfig();
 let serverWithCacheControl = require("./server.js").getServerWithCacheControl();
 const plugins = require("./plugins.js");
 const routes = require("../routes/routes.js");
@@ -15,8 +16,10 @@ const routes = require("../routes/routes.js");
 before(async () => {
   try {
     await server.register(plugins);
+    await serverWithEmptyAppConfig.register(plugins);
     await serverWithCacheControl.register(plugins);
     server.route(routes);
+    serverWithEmptyAppConfig.route(routes);
     serverWithCacheControl.route(routes);
 
     await server.route({
@@ -30,6 +33,7 @@ before(async () => {
       }
     });
     await server.start();
+    await serverWithEmptyAppConfig.start();
     await serverWithCacheControl.start();
   } catch (err) {
     expect(err).to.not.exist();
@@ -182,6 +186,13 @@ lab.experiment("server config", () => {
     expect(response.headers["cache-control"]).to.be.equal("no-cache");
   });
 
+  it("returns Cache-Control: no-cache if no cache config given with empty app config on server", async () => {
+    const response = await serverWithEmptyAppConfig.inject(
+      "/bundle/test-module2@^1.css"
+    );
+    expect(response.headers["cache-control"]).to.be.equal("no-cache");
+  });
+
   it("returns configured cache-control headers if given", async () => {
     const response = await serverWithCacheControl.inject(
       "/bundle/test-module2@^1.css"
@@ -193,6 +204,13 @@ lab.experiment("server config", () => {
 
   it("returns Cache-Control: no-cache if no cache config given", async () => {
     const response = await server.inject("/bundle/test-module1@^1.vars.json");
+    expect(response.headers["cache-control"]).to.be.equal("no-cache");
+  });
+
+  it("returns Cache-Control: no-cache if no cache config given with empty app config on server", async () => {
+    const response = await serverWithEmptyAppConfig.inject(
+      "/bundle/test-module1@^1.vars.json"
+    );
     expect(response.headers["cache-control"]).to.be.equal("no-cache");
   });
 
