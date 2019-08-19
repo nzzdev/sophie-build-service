@@ -33,14 +33,18 @@ async function getSatisfyingTarballUrl(gh, pack) {
     try {
       releases = await repo.listReleases();
     } catch (err) {
-      server.log(["error"], {
-        msg: `loading release list from github failed
-              for ${pack.name}: ${err.message}`
-      });
       if (err.response.status === 404) {
-        throw Boom.notFound("At least one requested module could not be found");
+        throw Boom.notFound(
+          `loading release list from github resulted in 404 for ${pack.name}: ${
+            err.message
+          }`
+        );
       }
-      throw Boom.internal();
+      throw Boom.internal(
+        `loading release list from github failed for ${pack.name}: ${
+          err.message
+        }`
+      );
     }
     const satisfiyingRelease = getSatisfyingRelease(
       releases.data,
@@ -80,21 +84,32 @@ module.exports = {
       const timingInfo = {};
 
       // find the satisfying release
-      const satisfyingTarballUrl = await getSatisfyingTarballUrl(gh, pack);
-      if (!satisfyingTarballUrl) {
-        throw Boom.badRequest(
-          `no satisfying tarbal found for ${pack.name}
-          with version: ${pack.version} 
-          and branch: ${pack.branch}`
-        );
+      let satisfyingTarballUrl;
+      try {
+        satisfyingTarballUrl = await getSatisfyingTarballUrl(gh, pack);
+        if (!satisfyingTarballUrl) {
+          throw Boom.badRequest(
+            `no satisfying tarbal found for ${pack.name}
+            with version: ${pack.version} 
+            and branch: ${pack.branch}`
+          );
+        }
+
+        timingInfo.satisfyingTarballUrlFound =
+          Date.now() - loadPackageStartTime;
+
+        server.log(["debug"], `found satisfiying tarball for ${pack.name}`);
+      } catch (e) {
+        // log
+        server.log(["error"], {
+          msg: e.message
+        });
+        // and rethrow the error
+        throw e;
       }
 
-      timingInfo.satisfyingTarballUrlFound = Date.now() - loadPackageStartTime;
-
-      server.log(["debug"], `found satisfiying tarball for ${pack.name}`);
-      server.log(["debug"], `going to fetch ${satisfyingTarballUrl}`);
-
       try {
+        server.log(["debug"], `going to fetch ${satisfyingTarballUrl}`);
         const response = await fetch(satisfyingTarballUrl, {
           headers: {
             Authorization:
