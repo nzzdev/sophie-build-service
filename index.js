@@ -1,6 +1,4 @@
-const Hoek = require("hoek");
-const Boom = require("boom");
-const Hapi = require("hapi");
+const Hapi = require("@hapi/hapi");
 const routes = require("./routes/routes.js");
 const path = require("path");
 
@@ -18,9 +16,11 @@ async function start() {
     port: process.env.PORT || 3000,
     cache: [
       {
-        engine: require("catbox-memory"),
-        options: {
-          maxByteSize: 1000000000 // ~ 1GB
+        provider: {
+          constructor: require("@hapi/catbox-memory"),
+          options: {
+            maxByteSize: 1000000000 // ~ 1GB
+          }
         }
       }
     ],
@@ -36,7 +36,7 @@ async function start() {
     }
   });
 
-  await server.register(require("inert"));
+  await server.register(require("@hapi/inert"));
 
   await server.register({
     plugin: require("./plugins/sophie-package-loader-github/index.js"),

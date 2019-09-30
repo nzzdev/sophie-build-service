@@ -1,6 +1,6 @@
 const fs = require("fs-extra");
 const path = require("path");
-const Hoek = require("hoek");
+const Hoek = require("@hapi/hoek");
 const crypto = require("crypto");
 
 const defaultServerMethodCaching = {

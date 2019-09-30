@@ -1,5 +1,5 @@
-const Lab = require("lab");
-const Code = require("code");
+const Lab = require("@hapi/lab");
+const Code = require("@hapi/code");
 const lab = (exports.lab = Lab.script());
 
 const expect = Code.expect;
@@ -7,7 +7,7 @@ const before = lab.before;
 const after = lab.after;
 const it = lab.it;
 
-let server = require("./server.js").getServer();
+let server = require("./server.js").getServerWithoutAppConfig();
 const plugins = require("./plugins.js");
 
 before(async () => {
