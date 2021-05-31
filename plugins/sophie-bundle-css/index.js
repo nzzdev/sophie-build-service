@@ -10,12 +10,12 @@ const defaultServerMethodCaching = {
   expiresIn: 48 * 60 * 60 * 1000, // expire after 48 hours
   staleIn: 1 * 60 * 5 * 1000, // rebuild bundles every 5 minutes on request
   staleTimeout: 1, // do not wait before returning a stale bundle
-  generateTimeout: 60 * 1000 // 1 minute
+  generateTimeout: 60 * 1000, // 1 minute
 };
 
 module.exports = {
   name: "sophie-bundle-css",
-  register: async function(server, options) {
+  register: async function (server, options) {
     Hoek.assert(options.tmpDir, "tmpDir is a required option");
 
     // $lab:coverage:off$
@@ -27,10 +27,9 @@ module.exports = {
 
     server.method(
       "sophie.generateBundle.css",
-      async function(bundleId) {
-        const packages = server.methods.sophie.bundle.getPackagesFromBundleId(
-          bundleId
-        );
+      async function (bundleId) {
+        const packages =
+          server.methods.sophie.bundle.getPackagesFromBundleId(bundleId);
         const packagesHash = crypto
           .createHash("md5")
           .update(bundleId)
@@ -66,13 +65,13 @@ module.exports = {
             );
             if (fs.existsSync(submodulePath)) {
               const submoduleFiles = fs.readdirSync(submodulePath);
-              filesToCompile = submoduleFiles.map(file => `scss/${file}`);
+              filesToCompile = submoduleFiles.map((file) => `scss/${file}`);
             } else {
               // this is mostly a fallback for older style sophie modules that just have a main.scss file
               filesToCompile = ["main.scss"];
             }
           } else {
-            filesToCompile = pack.submodules.map(sm => `scss/${sm}.scss`);
+            filesToCompile = pack.submodules.map((sm) => `scss/${sm}.scss`);
           }
 
           let fileName;
@@ -96,10 +95,10 @@ module.exports = {
                     pack.name,
                     pack.version || pack.branch,
                     "sophie_packages"
-                  )
+                  ),
                 ],
-                importer: [jsonImporter],
-                outputStyle: "compressed"
+                importer: [jsonImporter()],
+                outputStyle: "compressed",
               });
             } catch (err) {
               throw Boom.badImplementation(
@@ -120,8 +119,8 @@ module.exports = {
         return compiledStyles;
       },
       {
-        cache: cacheConfig
+        cache: cacheConfig,
       }
     );
-  }
+  },
 };

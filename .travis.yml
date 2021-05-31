@@ -1,16 +1,10 @@
-dist: trusty
+dist: xenial
 sudo: true
-addons:
-  apt:
-    sources:
-      - ubuntu-toolchain-r-test
-    packages:
-      - libstdc++-4.9-dev
 services:
   - docker
 language: node_js
 node_js:
-  - "12"
+  - "14"
 cache:
   directories:
     - node_modules
