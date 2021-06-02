@@ -1,4 +1,4 @@
-# Sophie Service
+## Sophie Service [![Build Status](https://travis-ci.com/nzzdev/sophie-build-service.svg?branch=dev)](https://travis-ci.com/nzzdev/sophie-build-service)
 
 **Maintainer**: [manuelroth](https://github.com/manuelroth)
 
