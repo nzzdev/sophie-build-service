@@ -1,6 +1,6 @@
 {
   "name": "sophie-build-service",
-  "version": "2.4.1",
+  "version": "2.4.2",
   "description": "Sophie Build Service",
   "main": "index.js",
   "scripts": {
