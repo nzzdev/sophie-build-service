@@ -6,6 +6,7 @@ WORKDIR /app
 
 # Copy package.json into work directory and install dependencies
 COPY package.json /app/package.json
+COPY package-lock.json /app/package-lock.json
 RUN npm install --production
 RUN npm install -g pino-socket
 
