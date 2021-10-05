@@ -72,8 +72,7 @@ async function start() {
       prettyPrint:
         process.env.APP_ENV !== "production" &&
         process.env.APP_ENV !== "staging" &&
-        process.env.APP_ENV !== "test" &&
-        process.env.APP_ENV !== "local",
+        process.env.APP_ENV !== "test",
       logRouteTags: true,
       // This is required otherwise the request object will be logged twice
       // See https://github.com/pinojs/hapi-pino/pull/92 for more details
