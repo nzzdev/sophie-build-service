@@ -1,5 +1,5 @@
 # Use following version of Node as the base image
-FROM node:14
+FROM node:14.7
 
 # Set work directory for run/cmd
 WORKDIR /app
