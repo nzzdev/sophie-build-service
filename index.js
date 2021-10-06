@@ -77,6 +77,7 @@ async function start() {
       // This is required otherwise the request object will be logged twice
       // See https://github.com/pinojs/hapi-pino/pull/92 for more details
       getChildBindings: () => ({}),
+      ignorePaths: ["/health"],
     },
   });
 
