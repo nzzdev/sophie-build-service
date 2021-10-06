@@ -4,7 +4,7 @@ FROM node:16-slim
 # Set work directory for run/cmd
 WORKDIR /app
 
-# Copy package.json into work directory and install dependencies
+# Copy package.json and package-lock.json into work directory and install dependencies
 COPY package.json /app/package.json
 COPY package-lock.json /app/package-lock.json
 RUN npm install --production
