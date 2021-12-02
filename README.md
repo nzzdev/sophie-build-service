@@ -14,7 +14,7 @@ You also need to set APP_ENV to 'staging' or 'production'.
 
 ## Logging
 
-Set these ENV variables to enable logging: `PINO_SOCKET_ADDRESS`, `PINO_SOCKET_MODE` and `PINO_SOCKET_PORT`
+Logging is configured with a json. Logging is configured that if the connection is lost, it tries to re-establish the connection.
 
 # Development
 
