@@ -1,6 +1,6 @@
 ## Sophie Service [![Build Status](https://travis-ci.com/nzzdev/sophie-build-service.svg?branch=dev)](https://travis-ci.com/nzzdev/sophie-build-service)
 
-**Maintainer**: [manuelroth](https://github.com/manuelroth)
+**Maintainer**: [Nicolas Staub](https://github.com/fromdusttilldawn)
 
 Served for the public through: https://service.sophie.nzz.ch
 
