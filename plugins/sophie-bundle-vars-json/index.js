@@ -5,8 +5,6 @@ const crypto = require("crypto");
 
 const defaultServerMethodCaching = {
   expiresIn: 48 * 60 * 60 * 1000, // expire after 48 hours
-  staleIn: 1 * 60 * 5 * 1000, // rebuild bundles every 5 minutes on request
-  staleTimeout: 1, // do not wait before returning a stale bundle
   generateTimeout: 60 * 1000 // 1 minute
 };
 
