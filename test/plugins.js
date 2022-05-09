@@ -12,7 +12,6 @@ module.exports = [
     options: {
       tmpDir: path.join(__dirname, "/tmp"),
       serverCacheConfig: {
-        staleTimeout: 99
       }
     }
   },
