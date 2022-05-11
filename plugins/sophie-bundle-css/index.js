@@ -45,12 +45,7 @@ module.exports = {
   name: "sophie-bundle-css",
   register: async function (server, options) {
     Hoek.assert(options.tmpDir, "tmpDir is a required option");
-
-    const cacheConfig = Hoek.applyToDefaults(
-      defaultServerMethodCaching,
-      options.serverCacheConfig || {}
-    );
-
+    
     server.method(
       "sophie.processPackage",
       async function (package, pathPrefix) {
@@ -94,7 +89,7 @@ module.exports = {
         }
       },
       {
-        cache: cacheConfig,
+        cache: defaultServerMethodCaching,
         generateKey: (package) => package.name + "/" + package.version,
       }
     )
@@ -117,7 +112,7 @@ module.exports = {
         return compiledStyles;
       },
       // {
-      //   cache: cacheConfig,
+      //   cache: defaultServerMethodCaching,
       // }
     );
   },
