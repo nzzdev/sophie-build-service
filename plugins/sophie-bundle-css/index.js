@@ -27,10 +27,11 @@ function compileStyle(package, loadPath, filesToCompile) {
         importer: [jsonImporter()],
         outputStyle: "compressed",
       });
-    } catch (err) {
-      throw Boom.badImplementation(
+    } catch (error) {
+      // server.log(["debug"], error);
+      throw new Error(
         `sass compilation error in package
-        ${package.name} file ${fileName}: ${err.message}`
+        ${package.name} file ${fileName}: ${error.message}`
       );
     }
 
@@ -59,32 +60,38 @@ module.exports = {
           package.name,
           package.version || package.branch
         );
-        await server.methods.sophie.loadPackage(package, loadPath);
 
-        // if this package has submodules, we need to compile them as well
-        let filesToCompile = [];
-        if (!package.submodules) {
-          // if no submodules are given, we compile all submodules
-          // check if there is the scss directory first to not fail if a module has no submodules
-          const submodulePath = path.join(
-            pathPrefix,
-            package.name,
-            package.version || package.branch,
-            "scss"
-          );
-          if (fs.existsSync(submodulePath)) {
-            const submoduleFiles = fs.readdirSync(submodulePath);
-            filesToCompile = submoduleFiles.map((file) => `scss/${file}`);
+        try {
+          await server.methods.sophie.loadPackage(package, loadPath);
+  
+          // if this package has submodules, we need to compile them as well
+          let filesToCompile = [];
+          if (!package.submodules) {
+            // if no submodules are given, we compile all submodules
+            // check if there is the scss directory first to not fail if a module has no submodules
+            const submodulePath = path.join(
+              pathPrefix,
+              package.name,
+              package.version || package.branch,
+              "scss"
+            );
+            if (fs.existsSync(submodulePath)) {
+              const submoduleFiles = fs.readdirSync(submodulePath);
+              filesToCompile = submoduleFiles.map((file) => `scss/${file}`);
+            } else {
+              // this is mostly a fallback for older style sophie modules that just have a main.scss file
+              filesToCompile = ["main.scss"];
+            }
           } else {
-            // this is mostly a fallback for older style sophie modules that just have a main.scss file
-            filesToCompile = ["main.scss"];
+            filesToCompile = package.submodules.map((sm) => `scss/${sm}.scss`);
           }
-        } else {
-          filesToCompile = package.submodules.map((sm) => `scss/${sm}.scss`);
+  
+          // compile all sass from this package and its submodules
+          return compileStyle(package, loadPath, filesToCompile); 
+        } catch (error) {
+          // server.log(["debug"], error);
+          throw error;
         }
-
-        // compile all sass from this package and its submodules
-        return compileStyle(package, loadPath, filesToCompile);
       },
       {
         cache: cacheConfig,
