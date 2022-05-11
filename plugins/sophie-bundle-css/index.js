@@ -1,21 +1,19 @@
 const fs = require("fs-extra");
 const path = require("path");
 const Hoek = require("@hapi/hoek");
-const Boom = require("@hapi/boom");
 const sass = require("sass");
 const jsonImporter = require("node-sass-json-importer");
 const crypto = require("crypto");
 
 const defaultServerMethodCaching = {
-  expiresIn: 48 * 60 * 60 * 1000, // expire after 48 hours
+  expiresIn: 7 * 24 * 60 * 60 * 1000, // expire after 7 days
   generateTimeout: 60 * 1000, // 1 minute
 };
 
-function compileStyle(package, loadPath, filesToCompile) {
-  let compiledStyles = "", fileName;
+function compileStyle(loadPath, filesToCompile) {
+  let fileName, compiledStyles = "";
 
   while ((fileName = filesToCompile.shift())) {
-    // server.log(["debug"], `compiling styles ${fileName} of ${package.name}`);
     let rendered;
 
     try {
@@ -30,14 +28,13 @@ function compileStyle(package, loadPath, filesToCompile) {
     } catch (error) {
       // server.log(["debug"], error);
       throw new Error(
-        `sass compilation error in package
-        ${package.name} file ${fileName}: ${error.message}`
+        `sass compilation error in file ${fileName}: ${error.message}`
       );
     }
 
     compiledStyles += rendered.css.toString();
-    // server.log(["debug"], `compiled styles ${fileName} of ${package.name}`);
   }
+
   return compiledStyles;
 }
 
@@ -47,9 +44,8 @@ module.exports = {
     Hoek.assert(options.tmpDir, "tmpDir is a required option");
     
     server.method(
-      "sophie.processPackage",
+      "sophie.css.processPackage",
       async function (package, pathPrefix) {
-        // download GitHub repository tarball for this package and save it to 'loadPath'
         const loadPath = path.join(
           pathPrefix,
           package.name,
@@ -57,6 +53,7 @@ module.exports = {
         );
 
         try {
+          // download GitHub repository tarball for this package and save it to 'loadPath'  
           await server.methods.sophie.loadPackage(package, loadPath);
   
           // if this package has submodules, we need to compile them as well
@@ -64,12 +61,7 @@ module.exports = {
           if (!package.submodules) {
             // if no submodules are given, we compile all submodules
             // check if there is the scss directory first to not fail if a module has no submodules
-            const submodulePath = path.join(
-              pathPrefix,
-              package.name,
-              package.version || package.branch,
-              "scss"
-            );
+            const submodulePath = path.join(loadPath, "scss");
             if (fs.existsSync(submodulePath)) {
               const submoduleFiles = fs.readdirSync(submodulePath);
               filesToCompile = submoduleFiles.map((file) => `scss/${file}`);
@@ -82,7 +74,7 @@ module.exports = {
           }
   
           // compile all sass from this package and its submodules
-          return compileStyle(package, loadPath, filesToCompile); 
+          return compileStyle(loadPath, filesToCompile); 
         } catch (error) {
           // server.log(["debug"], error);
           throw error;
@@ -90,7 +82,7 @@ module.exports = {
       },
       {
         cache: defaultServerMethodCaching,
-        generateKey: (package) => package.name + "/" + package.version,
+        generateKey: (package) => package.name + "@" + package.version + ".css",
       }
     )
 
@@ -106,7 +98,7 @@ module.exports = {
         let compiledStyles = "";
 
         for (const package of packages) {
-          compiledStyles += await server.methods.sophie.processPackage(package, pathPrefix);
+          compiledStyles += await server.methods.sophie.css.processPackage(package, pathPrefix);
         }
 
         return compiledStyles;
