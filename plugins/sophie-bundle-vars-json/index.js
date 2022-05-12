@@ -64,7 +64,7 @@ module.exports = {
       },
       {
         cache: defaultServerMethodCaching,
-        generateKey: (package) => package.name + "@" + package.version + ".vars.json",
+        generateKey: (package) => package.name + "@" + (package.version || package.branch) + ".vars.json",
       }
     )
 

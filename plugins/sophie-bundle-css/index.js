@@ -82,7 +82,7 @@ module.exports = {
       },
       {
         cache: defaultServerMethodCaching,
-        generateKey: (package) => package.name + "@" + package.version + ".css",
+        generateKey: (package) => package.name + "@" + (package.version || package.branch) + ".css",
       }
     )
 
