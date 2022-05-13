@@ -53,7 +53,6 @@ async function start() {
   });
 
   const tmpDir = path.join(__dirname, "/tmp");
-  console.log("$----", fs.readdirSync(tmpDir));
   await fs.emptyDir(tmpDir);
 
   await server.register({
