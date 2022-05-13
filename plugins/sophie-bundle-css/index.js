@@ -100,11 +100,13 @@ module.exports = {
           if (package.submodules) {
             compiledStyles += compiledPackageStyles
               .filter((submodule) => package.submodules.map((submoduleName) => `scss/${submoduleName}.scss`).includes(submodule.file))
-              .map((submodule) => submodule.style);
+              .map((submodule) => submodule.style)
+              .join("");
           } else {
             // if no submodules are given, we compile all submodules
             compiledStyles += compiledPackageStyles
-              .map((submodule) => submodule.style);
+              .map((submodule) => submodule.style)
+              .join("");
           }
         }
         return compiledStyles;
