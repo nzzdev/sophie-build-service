@@ -9,12 +9,14 @@ const defaultServerMethodCaching = {
 };
 
 function compileVars(loadPath, filesToCompile) {
-  let fileName, compiledVars = {};
+  let file, compiledVars = {};
 
-  while ((fileName = filesToCompile.shift())) {
+  while ((file = filesToCompile.shift())) {
+    const filePath = path.join(loadPath, file);
+    if (!fs.existsSync(filePath)) continue;
     compiledVars[
-      fileName.replace("vars/", "").replace(".json", "")
-    ] = require(path.join(loadPath, fileName));
+      file.replace("vars/", "").replace(".json", "")
+    ] = require(filePath);
   }
 
   return compiledVars;
@@ -33,26 +35,20 @@ module.exports = {
           package.name,
           package.version || package.branch
         );
+        const submoduleVarsPath = path.join(loadPath, "vars");
+        let filesToCompile = [];
 
         try {
           // download GitHub repository tarball for this package and save it to 'loadPath'
           await server.methods.sophie.loadPackage(package, loadPath);
   
-          // if this package has submodules, we need to compile them as well
-          let filesToCompile = [];
-          if (!package.submodules) {
-            // if no submodules are given, we compile all submodules
-            // check if there is the scss directory first to not fail if a module has no submodules
-            const submoduleVarsPath = path.join(loadPath, "vars");
-            if (fs.existsSync(submoduleVarsPath)) {
-              const submoduleVarFiles = fs.readdirSync(submoduleVarsPath);
-              filesToCompile = submoduleVarFiles.map(file => `vars/${file}`);
-            } else {
-              // this is mostly a fallback for older style sophie modules that just have a main.scss file
-              filesToCompile = ["vars.json"];
-            }
+          // check if there is the vars directory first to not fail if a module has no submodules
+          if (fs.existsSync(submoduleVarsPath)) {
+            const submoduleVarFiles = fs.readdirSync(submoduleVarsPath);
+            filesToCompile = submoduleVarFiles.map(file => `vars/${file}`);
           } else {
-            filesToCompile = package.submodules.map(sm => `vars/${sm}.json`);
+            // this is mostly a fallback for older style sophie modules that just have a vars.json file
+            filesToCompile = ["vars.json"];
           }
   
           // compile all sass from this package and its submodules
@@ -77,12 +73,21 @@ module.exports = {
           .update(bundleId)
           .digest("hex");
         const pathPrefix = path.join(options.tmpDir, packagesHash);
-        const compiledVars = {};
+        let compiledVars = {}, compiledVarsPackage = {};
 
         for (const package of packages) {
-          compiledVars[package.name] = await server.methods.sophie.vars_json.processPackage(package, pathPrefix);
-        }
+          compiledVarsPackage = await server.methods.sophie.vars_json.processPackage(package, pathPrefix);
 
+          if (package.submodules) {
+            for (const submoduleName of package.submodules) {
+              compiledVars[package.name] = {};
+              compiledVars[package.name][submoduleName] = compiledVarsPackage[submoduleName];
+            }
+          } else {
+            // if no submodules are given, we compile all submodules
+            compiledVars[package.name] = compiledVarsPackage;
+          }
+        }
         return JSON.stringify(compiledVars);
       },
       // {

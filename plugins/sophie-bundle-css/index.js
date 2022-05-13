@@ -11,14 +11,14 @@ const defaultServerMethodCaching = {
 };
 
 function compileStyle(loadPath, filesToCompile) {
-  let fileName, compiledStyles = "";
+  let file, compiledStyles = [];
 
-  while ((fileName = filesToCompile.shift())) {
+  while ((file = filesToCompile.shift())) {
     let rendered;
 
     try {
       rendered = sass.renderSync({
-        file: path.join(loadPath, fileName),
+        file: path.join(loadPath, file),
         includePaths: [
           path.join(loadPath, "sophie_packages"),
         ],
@@ -28,11 +28,14 @@ function compileStyle(loadPath, filesToCompile) {
     } catch (error) {
       // server.log(["debug"], error);
       throw new Error(
-        `sass compilation error in file ${fileName}: ${error.message}`
+        `sass compilation error in file ${file}: ${error.message}`
       );
     }
 
-    compiledStyles += rendered.css.toString();
+    compiledStyles.push({
+      file: file,
+      style: rendered.css.toString(),
+    });
   }
 
   return compiledStyles;
@@ -51,30 +54,24 @@ module.exports = {
           package.name,
           package.version || package.branch
         );
+        const submodulePath = path.join(loadPath, "scss");
+        let filesToCompile = [];
 
         try {
           // download GitHub repository tarball for this package and save it to 'loadPath'  
           await server.methods.sophie.loadPackage(package, loadPath);
-  
-          // if this package has submodules, we need to compile them as well
-          let filesToCompile = [];
-          if (!package.submodules) {
-            // if no submodules are given, we compile all submodules
-            // check if there is the scss directory first to not fail if a module has no submodules
-            const submodulePath = path.join(loadPath, "scss");
-            if (fs.existsSync(submodulePath)) {
-              const submoduleFiles = fs.readdirSync(submodulePath);
-              filesToCompile = submoduleFiles.map((file) => `scss/${file}`);
-            } else {
-              // this is mostly a fallback for older style sophie modules that just have a main.scss file
-              filesToCompile = ["main.scss"];
-            }
+
+          // check if there is the scss directory first to not fail if a module has no submodules
+          if (fs.existsSync(submodulePath)) {
+            const submoduleFiles = fs.readdirSync(submodulePath);
+            filesToCompile = submoduleFiles.map((file) => `scss/${file}`);
           } else {
-            filesToCompile = package.submodules.map((sm) => `scss/${sm}.scss`);
+            // this is mostly a fallback for older style sophie modules that just have a main.scss file
+            filesToCompile = ["main.scss"];
           }
   
           // compile all sass from this package and its submodules
-          return compileStyle(loadPath, filesToCompile); 
+          return compileStyle(loadPath, filesToCompile);
         } catch (error) {
           // server.log(["debug"], error);
           throw error;
@@ -95,12 +92,21 @@ module.exports = {
           .update(bundleId)
           .digest("hex");
         const pathPrefix = path.join(options.tmpDir, packagesHash);
-        let compiledStyles = "";
+        let compiledStyles = "", compiledPackageStyles = [];
 
         for (const package of packages) {
-          compiledStyles += await server.methods.sophie.css.processPackage(package, pathPrefix);
-        }
+          compiledPackageStyles = await server.methods.sophie.css.processPackage(package, pathPrefix);
 
+          if (package.submodules) {
+            compiledStyles += compiledPackageStyles
+              .filter((submodule) => package.submodules.map((submoduleName) => `scss/${submoduleName}.scss`).includes(submodule.file))
+              .map((submodule) => submodule.style);
+          } else {
+            // if no submodules are given, we compile all submodules
+            compiledStyles += compiledPackageStyles
+              .map((submodule) => submodule.style);
+          }
+        }
         return compiledStyles;
       },
       // {
