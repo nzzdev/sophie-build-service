@@ -4,7 +4,7 @@ const Hoek = require("@hapi/hoek");
 const crypto = require("crypto");
 
 const defaultServerMethodCaching = {
-  expiresIn: 48 * 60 * 60 * 1000, // expire after 48 hours
+  expiresIn: 7 * 24 * 60 * 60 * 1000, // expire after 7 days
   generateTimeout: 60 * 1000 // 1 minute
 };
 
