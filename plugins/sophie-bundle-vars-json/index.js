@@ -54,7 +54,6 @@ module.exports = {
           // compile all sass from this package and its submodules
           return compileVars(loadPath, filesToCompile); 
         } catch (error) {
-          // server.log(["debug"], error);
           throw error;
         }
       },

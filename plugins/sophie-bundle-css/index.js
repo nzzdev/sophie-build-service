@@ -26,7 +26,6 @@ function compileStyle(loadPath, filesToCompile) {
         outputStyle: "compressed",
       });
     } catch (error) {
-      // server.log(["debug"], error);
       throw new Error(
         `sass compilation error in file ${file}: ${error.message}`
       );
@@ -73,7 +72,6 @@ module.exports = {
           // compile all sass from this package and its submodules
           return compileStyle(loadPath, filesToCompile);
         } catch (error) {
-          // server.log(["debug"], error);
           throw error;
         }
       },
