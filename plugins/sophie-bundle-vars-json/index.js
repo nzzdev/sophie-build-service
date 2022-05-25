@@ -89,9 +89,9 @@ module.exports = {
         }
         return JSON.stringify(compiledVars);
       },
-      // {
-      //   cache: defaultServerMethodCaching
-      // }
+      {
+        cache: defaultServerMethodCaching,
+      }
     );
   }
 };

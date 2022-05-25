@@ -109,9 +109,9 @@ module.exports = {
         }
         return compiledStyles;
       },
-      // {
-      //   cache: defaultServerMethodCaching,
-      // }
+      {
+        cache: defaultServerMethodCaching,
+      }
     );
   },
 };
