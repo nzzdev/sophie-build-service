@@ -4,7 +4,7 @@
   "description": "Sophie Build Service",
   "main": "index.js",
   "scripts": {
-    "test": "lab -a @hapi/code -t 100 -c -P tests --verbose --leaks"
+    "test": "lab -a @hapi/code -t 80 -c -P tests --verbose --leaks"
   },
   "author": "Beni Buess <beni.buess@nzz.ch>",
   "license": "MIT",

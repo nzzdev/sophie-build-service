@@ -1,3 +1,4 @@
+const fs = require("fs-extra");
 const Hapi = require("@hapi/hapi");
 const routes = require("./routes/routes.js");
 const path = require("path");
@@ -51,17 +52,20 @@ async function start() {
     plugin: require("./plugins/sophie-bundle/index.js"),
   });
 
+  const tmpDir = path.join(__dirname, "/tmp");
+  await fs.emptyDir(tmpDir);
+
   await server.register({
     plugin: require("./plugins/sophie-bundle-css/index.js"),
     options: {
-      tmpDir: path.join(__dirname, "/tmp"),
+      tmpDir: tmpDir,
     },
   });
 
   await server.register({
     plugin: require("./plugins/sophie-bundle-vars-json/index.js"),
     options: {
-      tmpDir: path.join(__dirname, "/tmp"),
+      tmpDir: tmpDir,
     },
   });
 
