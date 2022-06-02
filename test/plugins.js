@@ -11,15 +11,12 @@ module.exports = [
     plugin: require("../plugins/sophie-bundle-css/index.js"),
     options: {
       tmpDir: path.join(__dirname, "/tmp"),
-      serverCacheConfig: {
-        staleTimeout: 99
-      }
     }
   },
   {
     plugin: require("../plugins/sophie-bundle-vars-json/index.js"),
     options: {
-      tmpDir: path.join(__dirname, "/tmp")
+      tmpDir: path.join(__dirname, "/tmp"),
     }
   }
 ];
