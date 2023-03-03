@@ -26,7 +26,7 @@ function getSatisfyingBranch(branches, branch) {
 }
 
 async function getSatisfyingTarballUrl(gh, pack) {
-  const repo = gh.getRepo("chm-sophie", pack.name);
+  const repo = gh.getRepo(process.env.GITHUB_ORG_NAME, pack.name);
 
   if (pack.version) {
     let releases;
