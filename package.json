@@ -24,7 +24,7 @@
     "hapi-pino": "^8.4.0",
     "node-fetch": "^2.6.5",
     "node-sass-json-importer": "^4.3.0",
-    "sass": "^1.42.1",
+    "sass": "^1.79.3",
     "semver": "^7.3.5",
     "tar": "^6.1.11"
   },
