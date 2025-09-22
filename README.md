@@ -6,6 +6,18 @@ Served for the public through: https://service.sophie.nzz.ch
 
 ![Sophie Architecture](public/system-overview.png)
 
+# Changing CSS for Sophie and Deploying the Changes
+
+1. Add your changes in SCSS in the various Sophie repositories
+2. Update the `package.json` version with `npm version patch` (not sure if necessary?)
+3. Tag the version commit additionally with a version number without the `v` (`git tag -a 1.1.0`)
+4. Push changes to Github
+5. Create a new release on Github (Releases > Draft a new release), using the newly created tag
+6. On Rancher, re-deploy the `sophie-build-service`.
+7. On KeyCDN, purge the `sophieservice` zone.
+
+This should result in new Sophie CSS bundles being delivered to the front end.
+
 # Deployment
 
 This is running on our internal Rancher hosts and publicly served through keycdn.
