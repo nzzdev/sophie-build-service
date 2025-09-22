@@ -13,7 +13,7 @@ Served for the public through: https://service.sophie.nzz.ch
 3. Tag the version commit additionally with a version number without the `v` (`git tag -a 1.1.0`)
 4. Push changes to Github
 5. Create a new release on Github (Releases > Draft a new release), using the newly created tag
-6. On Rancher, re-deploy the `sophie-build-service`.
+6. On Rancher, re-deploy the `sophie-build-service` and `export-service`.
 7. On KeyCDN, purge the `sophieservice` zone.
 
 This should result in new Sophie CSS bundles being delivered to the front end.
